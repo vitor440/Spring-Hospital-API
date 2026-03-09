@@ -30,7 +30,7 @@ public class ConsultaService {
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe médico com esse ID!"));
 
         Paciente paciente = pacienteRepository.findById(request.pacienteId())
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe médico com esse ID!"));
+                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe paciente com esse ID!"));
 
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);

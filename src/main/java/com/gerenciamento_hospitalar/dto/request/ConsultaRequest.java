@@ -6,14 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record ConsultaRequest(@NotNull
+public record ConsultaRequest(@NotNull(message = "campo obrigatório!")
                               Long medicoId,
-                              @NotNull
+                              @NotNull(message = "campo obrigatório!")
                               Long pacienteId,
                               String proposito,
-                              @NotNull
-                              @Future
+                              @NotNull(message = "campo obrigatório!")
+                              @Future(message = "A data da consulta não pode ser no passado!")
                               LocalDate data,
-                              @NotNull
+                              @NotNull(message = "campo obrigatório!")
                               LocalTime hora) {
 }
