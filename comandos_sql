@@ -1,0 +1,68 @@
+create table departamento(
+     id bigint generated always as identity primary key,
+     nome varchar(50) not null,
+     localizacao varchar(50)
+);
+
+create table medico(
+   id bigint generated always as identity primary key,
+   nome_completo varchar(150) not null,
+   email varchar(200) unique not null,
+   telefone varchar(100) not null,
+   especialidade varchar(80) not null,
+   departamento_id bigint not null references departamento(id),
+   constraint chk_especialidade check(especialidade in ('CARDIOLOGISTA', 'NEUROLOGISTA', 'HEPATOLOGISTA', 'ENDOCRINOLOGISTA', 'DERMATOLOGISTA','OFTALMOLOGISTA', 'PSICOLOGO', 'PSIQUIATRA'))
+);
+
+
+
+create table paciente(
+     id bigint generated always as identity primary key,
+     nome varchar(100) not null,
+     sobrenome varchar(100) not null,
+     genero varchar(30) not null,
+     endereco varchar(150) not null,
+     email varchar(200) unique not null,
+     telefone varchar(100) not null,
+     tipo_sanguineo varchar(30) not null,
+     data_nascimento date not null,
+     peso numeric(5,2) not null
+);
+
+create table consulta(
+     id bigint generated always as identity primary key,
+     medico_id bigint not null references medico(id),
+     paciente_id bigint not null references paciente(id),
+     proposito varchar(500),
+     data date not null,
+     horario_inicio time not null,
+     horario_fim time not null,
+     status varchar(30) not null,
+     constraint chk_status check(status in ('AGENDADA','REALIZADA','CANCELADA','FALTANTE'))
+);
+
+create table medicamento(
+    id bigint generated always as identity primary key,
+    nome varchar(100) not null,
+    marca varchar(80),
+    tipo varchar(30) not null,
+    dosagem varchar(30) not null,
+    descricao varchar(500) not null,
+    estoque int not null
+);
+
+create table prescricao(
+   id bigint generated always as identity primary key,
+   consulta_id bigint not null references consulta(id) not null,
+   medicamento_id bigint not null references medicamento(id) not null,
+   dosagem varchar(30) not null,
+   frequencia varchar(30) not null,
+   comentarios varchar(500)
+);
+
+create table registro_medico(
+    id bigint generated always as identity primary key,
+    consulta_id bigint not null references consulta(id) not null,
+    diagnostico varchar(300) not null,
+    tratamento varchar(300) not null
+);

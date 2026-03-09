@@ -1,0 +1,41 @@
+package com.gerenciamento_hospitalar.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "paciente")
+@Data
+public class Paciente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "cpf")
+    private String cpf;
+
+    @Column(name = "nome")
+    private String nome;
+
+    @Column(name = "genero")
+    private String genero;
+
+    @Column(name = "endereco")
+    private String endereco;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "telefone")
+    private String telefone;
+
+    @Column(name = "tipo_sanguineo")
+    private String tipoSanguineo;
+
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+}

@@ -1,0 +1,38 @@
+package com.gerenciamento_hospitalar.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "consulta")
+@Data
+public class Consulta {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "medico_id")
+    private Medico medico;
+
+    @ManyToOne
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
+
+    @Column(name = "proposito")
+    private String proposito;
+
+    @Column(name = "data")
+    private LocalDate data;
+
+    @Column(name = "hora")
+    private LocalTime hora;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private StatusConsulta status;
+}
