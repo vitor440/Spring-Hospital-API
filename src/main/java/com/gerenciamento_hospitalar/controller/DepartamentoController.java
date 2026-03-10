@@ -33,4 +33,15 @@ public class DepartamentoController {
     public ResponseEntity<DepartamentoResponse> atualizarDepartamento(@PathVariable("id") Long id, @RequestBody @Valid DepartamentoRequest request) {
         return ResponseEntity.ok(service.atualizarDepartamento(id, request));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarDepartamentoPeloId(@PathVariable("id") Long id) {
+        service.deletarDepartamentoPeloId(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartamentoResponse> obterDepartamentoPeloId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.obterDepartamentoPeloId(id));
+    }
 }

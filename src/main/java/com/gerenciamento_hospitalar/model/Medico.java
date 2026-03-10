@@ -2,9 +2,13 @@ package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+
+import java.util.List;
 
 @Entity
 @Table(name = "medico")
+@ToString(exclude = {"departamentos", "consultas"})
 @Data
 public class Medico {
 
@@ -31,4 +35,7 @@ public class Medico {
     @ManyToOne
     @JoinColumn(name = "departamento_id")
     private Departamento departamento;
+
+    @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
+    private List<Consulta> consultas;
 }

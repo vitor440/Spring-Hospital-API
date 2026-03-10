@@ -2,15 +2,18 @@ package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "departamento")
 @Data
+@ToString(exclude = "medicos")
 @EntityListeners(AuditingEntityListener.class)
 public class Departamento {
 
@@ -27,4 +30,7 @@ public class Departamento {
     @Column(name = "data_criacao")
     @CreatedDate
     private LocalDateTime dataCriacao;
+
+    @OneToMany(mappedBy = "departamento", fetch = FetchType.LAZY)
+    private List<Medico> medicos;
 }

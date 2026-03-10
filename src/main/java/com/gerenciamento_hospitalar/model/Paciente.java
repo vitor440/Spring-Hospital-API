@@ -3,11 +3,14 @@ package com.gerenciamento_hospitalar.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "paciente")
+@ToString(exclude = "consultas")
 @Data
 public class Paciente {
 
@@ -38,4 +41,7 @@ public class Paciente {
 
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
+
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    private List<Consulta> consultas;
 }

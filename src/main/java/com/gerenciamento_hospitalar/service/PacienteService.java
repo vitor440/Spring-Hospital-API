@@ -6,6 +6,7 @@ import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.PacienteMapper;
 import com.gerenciamento_hospitalar.model.Paciente;
 import com.gerenciamento_hospitalar.repository.PacienteRepository;
+import com.gerenciamento_hospitalar.validator.PacienteValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,13 @@ import org.springframework.stereotype.Service;
 public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
+    private final PacienteValidator validator;
     private final PacienteMapper mapper;
 
     public PacienteResponse addPaciente(PacienteRequest request) {
         Paciente paciente = mapper.toEntity(request);
+
+        validator.validar(paciente);
         return mapper.toDTO(pacienteRepository.save(paciente));
     }
 
@@ -34,6 +38,7 @@ public class PacienteService {
         paciente.setTipoSanguineo(request.tipoSanguineo());
         paciente.setDataNascimento(request.dataNascimento());
 
+        validator.validar(paciente);
         return mapper.toDTO(pacienteRepository.save(paciente));
     }
 }

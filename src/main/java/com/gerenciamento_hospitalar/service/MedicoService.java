@@ -8,6 +8,7 @@ import com.gerenciamento_hospitalar.model.Departamento;
 import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
+import com.gerenciamento_hospitalar.validator.MedicoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class MedicoService {
 
     private final MedicoRepository medicoRepository;
+    private final MedicoValidator validator;
     private final MedicoMapper mapper;
     private final DepartamentoRepository departamentoRepository;
 
@@ -26,6 +28,8 @@ public class MedicoService {
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
 
         medico.setDepartamento(departamento);
+
+        validator.validar(medico);
         return mapper.toDTO(medicoRepository.save(medico));
     }
 
@@ -44,6 +48,7 @@ public class MedicoService {
 
         medico.setDepartamento(departamento);
 
+        validator.validar(medico);
         return mapper.toDTO(medicoRepository.save(medico));
     }
 }
