@@ -8,6 +8,8 @@ import com.gerenciamento_hospitalar.model.Departamento;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.validator.DepartamentoValidator;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.cache.spi.DirectAccessRegion;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,8 +28,7 @@ public class DepartamentoService {
     }
 
     public DepartamentoResponse atualizarDepartamento(Long id, DepartamentoRequest request) {
-        Departamento departamento = departamentoRepository.findById(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
+        Departamento departamento = obterDepartamentoPeloIdOuLancarExcecao(id);
 
         departamento.setNome(request.nome());
         departamento.setLocalizacao(request.localizacao());
@@ -37,17 +38,39 @@ public class DepartamentoService {
     }
 
     public DepartamentoResponse obterDepartamentoPeloId(Long id) {
-        Departamento departamento = departamentoRepository.findById(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
+        Departamento departamento = obterDepartamentoPeloIdOuLancarExcecao(id);
 
         return mapper.toDTO(departamento);
     }
 
     public void deletarDepartamentoPeloId(Long id) {
-        Departamento departamento = departamentoRepository.findById(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
+        Departamento departamento = obterDepartamentoPeloIdOuLancarExcecao(id);
 
         validator.validarDelecao(departamento);
         departamentoRepository.delete(departamento);
+    }
+
+    public Page<DepartamentoResponse> listarDepartamentos(String nome, String localizacao, int pagina, int tamanho, String direction) {
+
+        Departamento departamento = new Departamento();
+        departamento.setNome(nome);
+        departamento.setLocalizacao(localizacao);
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreNullValues()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Example<Departamento> example = Example.of(departamento, matcher);
+
+        Sort.Direction sort = direction.equalsIgnoreCase("ASC")? Sort.Direction.ASC: Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort);
+
+        return departamentoRepository.findAll(example, pageable).map(mapper::toDTO);
+    }
+
+    private Departamento obterDepartamentoPeloIdOuLancarExcecao(Long id) {
+        return departamentoRepository.findById(id)
+                .orElseThrow(() ->  new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
     }
 }

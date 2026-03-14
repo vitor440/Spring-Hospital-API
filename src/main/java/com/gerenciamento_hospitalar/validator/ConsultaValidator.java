@@ -3,8 +3,13 @@ package com.gerenciamento_hospitalar.validator;
 import com.gerenciamento_hospitalar.exception.ConsultasConflitantesException;
 import com.gerenciamento_hospitalar.exception.HoraForaDoPadraoException;
 import com.gerenciamento_hospitalar.model.Consulta;
+import com.gerenciamento_hospitalar.model.DisponibilidadeMedico;
+import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
+import com.gerenciamento_hospitalar.repository.DisponibilidadeMedicoRepository;
+import com.gerenciamento_hospitalar.repository.specs.DisponibilidadeMedicoSpecs;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -14,18 +19,23 @@ import java.util.Optional;
 public class ConsultaValidator {
 
     private final ConsultaRepository consultaRepository;
+    private final DisponibilidadeMedicoRepository disponibilidadeMedicoRepository;
 
     public void validar(Consulta consulta) {
         if(datasConflitantes(consulta)) {
-            throw new ConsultasConflitantesException("");
+            throw new ConsultasConflitantesException("Consulta conflitante com outra!");
         }
 
         if(horarioForaDoPadrao(consulta)) {
             throw new HoraForaDoPadraoException("Horário da consulta não segue o padrão especificado!");
         }
+
+        if(medicoIndisponivel(consulta)) {
+            throw new ConsultasConflitantesException("Médico não disponível!");
+        }
     }
 
-    public boolean datasConflitantes(Consulta consulta) {
+    private boolean datasConflitantes(Consulta consulta) {
         Optional<Consulta> consultaEncontrada = consultaRepository
                 .findByMedicoAndDataAndHora(consulta.getMedico(), consulta.getData(), consulta.getHora());
 
@@ -38,7 +48,7 @@ public class ConsultaValidator {
                 .anyMatch(id -> !id.equals(consulta.getId()));
     }
 
-    public boolean horarioForaDoPadrao(Consulta consulta) {
+    private boolean horarioForaDoPadrao(Consulta consulta) {
         int minuto = consulta.getHora().getMinute();
 
         if(minuto % 20 != 0) {
@@ -47,4 +57,13 @@ public class ConsultaValidator {
 
         return false;
     }
-}
+
+    private boolean medicoIndisponivel(Consulta consulta) {
+        int diaSemana = consulta.getData().getDayOfWeek().getValue();
+
+        Specification<DisponibilidadeMedico> specs = DisponibilidadeMedicoSpecs
+                .verificaDisponibilidade(consulta.getMedico(), diaSemana, consulta.getHora());
+
+        return !disponibilidadeMedicoRepository.exists(specs);
+    }
+ }

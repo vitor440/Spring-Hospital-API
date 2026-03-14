@@ -5,11 +5,9 @@ import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.service.ConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -31,5 +29,25 @@ public class ConsultaController {
                 .toUri();
 
         return ResponseEntity.created(location).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ConsultaResponse> atualizarConsulta(@PathVariable("id") Long id, @RequestBody @Valid ConsultaRequest request) {
+
+        return ResponseEntity.ok(service.atualizarConsulta(id, request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ConsultaResponse> obterConsultaPeloId(@PathVariable("id") Long id) {
+
+        return ResponseEntity.ok(service.obterConsultaPeloId(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ConsultaResponse> deletarConsultaPeloId(@PathVariable("id") Long id) {
+
+        service.deletarConsultaPeloId(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

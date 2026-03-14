@@ -20,7 +20,7 @@ public class PacienteValidator {
         }
     }
 
-    public boolean cpfDuplicado(Paciente paciente) {
+    private boolean cpfDuplicado(Paciente paciente) {
         Optional<Paciente> pacienteEncontrado = pacienteRepository.findByCpf(paciente.getCpf());
 
         if(paciente.getId() == null) {

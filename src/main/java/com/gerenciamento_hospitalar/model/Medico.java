@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "medico")
-@ToString(exclude = {"departamentos", "consultas"})
+@ToString(exclude = {"departamentos", "consultas", "disponibilidades"})
 @Data
 public class Medico {
 
@@ -38,4 +38,7 @@ public class Medico {
 
     @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
     private List<Consulta> consultas;
+
+    @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
+    private List<DisponibilidadeMedico> disponibilidades;
 }

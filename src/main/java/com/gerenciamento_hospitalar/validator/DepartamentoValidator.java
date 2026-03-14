@@ -23,7 +23,7 @@ public class DepartamentoValidator {
         }
     }
 
-    public boolean existeDuplicidade(Departamento departamento) {
+    private boolean existeDuplicidade(Departamento departamento) {
         Optional<Departamento> departamentoEncontrado = departamentoRepository.findByNome(departamento.getNome());
 
         if(departamento.getId() == null) {

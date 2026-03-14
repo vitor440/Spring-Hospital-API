@@ -20,7 +20,7 @@ public class MedicoValidator {
         }
     }
 
-    public boolean crmDuplicado(Medico medico) {
+    private boolean crmDuplicado(Medico medico) {
         Optional<Medico> medicoEncontrado = medicoRepository.findByCrm(medico.getCrm());
 
         if(medico.getId() == null) {

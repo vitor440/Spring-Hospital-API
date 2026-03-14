@@ -5,6 +5,7 @@ import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.service.DepartamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -44,4 +45,17 @@ public class DepartamentoController {
     public ResponseEntity<DepartamentoResponse> obterDepartamentoPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterDepartamentoPeloId(id));
     }
+
+    @GetMapping
+    public ResponseEntity<Page<DepartamentoResponse>> listarDepartamentos(
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "localizacao", required = false) String localizacao,
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
+            @RequestParam(value = "direction", defaultValue = "DESC") String direction
+    ) {
+        return ResponseEntity.ok(service.listarDepartamentos(nome, localizacao, pagina, tamanho, direction));
+    }
+
+
 }
