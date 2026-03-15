@@ -1,7 +1,9 @@
 package com.gerenciamento_hospitalar.validator;
 
+import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
 import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class MedicoValidator {
 
     private final MedicoRepository medicoRepository;
+    private final ConsultaRepository consultaRepository;
 
     public void validar(Medico medico) {
         if(crmDuplicado(medico)) {
@@ -30,5 +33,11 @@ public class MedicoValidator {
         return medicoEncontrado.map(Medico::getId)
                 .stream()
                 .anyMatch(id -> !id.equals(medico.getId()));
+    }
+
+    public void validarDelecao(Medico medico) {
+        if (consultaRepository.existsByMedico(medico)) {
+            throw new DelecaoNaoPermitidaException("Não é permitido a exclusão de médicos com consultas ativas!");
+        }
     }
 }

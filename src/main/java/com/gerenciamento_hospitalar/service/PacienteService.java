@@ -52,7 +52,9 @@ public class PacienteService {
     }
 
     public void deletarPaciente(Long id) {
-        pacienteRepository.delete(obterPacientePeloIdOuLancarExcecao(id));
+        Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
+        validator.validarDelecao(paciente);
+        pacienteRepository.delete(paciente);
     }
 
     public Page<PacienteResponse> listarPacientes(String nome, String genero, String tipoSanguineo, int pagina,

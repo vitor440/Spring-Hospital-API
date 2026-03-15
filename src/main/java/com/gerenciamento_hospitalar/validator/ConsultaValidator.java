@@ -4,7 +4,6 @@ import com.gerenciamento_hospitalar.exception.ConsultasConflitantesException;
 import com.gerenciamento_hospitalar.exception.HoraForaDoPadraoException;
 import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.model.DisponibilidadeMedico;
-import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.DisponibilidadeMedicoRepository;
 import com.gerenciamento_hospitalar.repository.specs.DisponibilidadeMedicoSpecs;

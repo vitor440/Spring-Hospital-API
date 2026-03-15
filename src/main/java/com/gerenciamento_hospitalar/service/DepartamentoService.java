@@ -64,7 +64,7 @@ public class DepartamentoService {
         Example<Departamento> example = Example.of(departamento, matcher);
 
         Sort.Direction sort = direction.equalsIgnoreCase("ASC")? Sort.Direction.ASC: Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(pagina, tamanho, sort);
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "nome");
 
         return departamentoRepository.findAll(example, pageable).map(mapper::toDTO);
     }

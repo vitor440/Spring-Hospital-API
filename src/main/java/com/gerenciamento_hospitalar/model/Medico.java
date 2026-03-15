@@ -36,9 +36,9 @@ public class Medico {
     @JoinColumn(name = "departamento_id")
     private Departamento departamento;
 
-    @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "medico")
     private List<Consulta> consultas;
 
-    @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL)
     private List<DisponibilidadeMedico> disponibilidades;
 }

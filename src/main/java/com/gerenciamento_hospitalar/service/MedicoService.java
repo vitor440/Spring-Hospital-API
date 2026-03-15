@@ -64,7 +64,10 @@ public class MedicoService {
     }
 
     public void deletarMedicoPeloId(Long id) {
-        medicoRepository.delete(obterMedicoPeloIdOuLancarExcecao(id));
+
+       Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
+       validator.validarDelecao(medico);
+       medicoRepository.delete(medico);
     }
 
     public Page<MedicoResponse> ListarMedicos(String nome, Especialidade especialidade, int pagina, int tamanho, String direction) {

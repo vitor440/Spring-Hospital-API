@@ -8,6 +8,7 @@ import com.gerenciamento_hospitalar.model.DisponibilidadeMedico;
 import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.DisponibilidadeMedicoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
+import com.gerenciamento_hospitalar.validator.DisponibilidadeMedicoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class DisponibilidadeMedicoService {
 
     private final DisponibilidadeMedicoRepository disponibilidadeMedicoRepository;
+    private final DisponibilidadeMedicoValidator validator;
     private final MedicoRepository medicoRepository;
     private final DisponibilidadeMedicoMapper mapper;
 
@@ -29,6 +31,7 @@ public class DisponibilidadeMedicoService {
 
         disponibilidadeMedico.setMedico(medico);
 
+        validator.validar(disponibilidadeMedico);
         return mapper.toDTO(disponibilidadeMedicoRepository.save(disponibilidadeMedico));
     }
 
@@ -43,6 +46,7 @@ public class DisponibilidadeMedicoService {
 
         disponibilidadeMedico.setMedico(medico);
 
+        validator.validar(disponibilidadeMedico);
         return mapper.toDTO(disponibilidadeMedicoRepository.save(disponibilidadeMedico));
     }
 
@@ -50,14 +54,16 @@ public class DisponibilidadeMedicoService {
         return mapper.toDTO(obterPorIdOuLancarExcecao(id));
     }
 
-    public void deletarPeloId(Long id) {
-        disponibilidadeMedicoRepository.delete(obterPorIdOuLancarExcecao(id));
-    }
-
     public Page<DisponibilidadeMedicoResponse> listarDisponibilidades(int pagina, int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
 
         return disponibilidadeMedicoRepository.findAll(pageable).map(mapper::toDTO);
+    }
+
+    public void deletarPeloId(Long id) {
+        DisponibilidadeMedico disponibilidadeMedico = obterPorIdOuLancarExcecao(id);
+        validator.validarDelecao(disponibilidadeMedico);
+        disponibilidadeMedicoRepository.delete(disponibilidadeMedico);
     }
 
     private DisponibilidadeMedico obterPorIdOuLancarExcecao(Long id) {
