@@ -11,5 +11,6 @@ public record ConsultaResponse(Long id,
                                String proposito,
                                LocalDate data,
                                LocalTime hora,
+                               Integer diaSemana,
                                StatusConsulta status) {
 }

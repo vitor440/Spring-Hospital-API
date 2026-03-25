@@ -1,3 +1,7 @@
+server:
+  port: 8888
+cors:
+  originPatterns: https://www.udemy.com,http://localhost:8080
 spring:
   application:
     name: gerenciamento-hostpitalar
@@ -8,3 +12,4 @@ spring:
     properties:
       hibernate:
         format_sql: true
+

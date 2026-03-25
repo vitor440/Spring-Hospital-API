@@ -36,6 +36,7 @@ public class ConsultaService {
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
         consulta.setStatus(StatusConsulta.AGENDADA);
+        consulta.setDiaSemana(consulta.getData().getDayOfWeek().getValue());
 
         validator.validar(consulta);
         return mapper.toDTO(consultaRepository.save(consulta));
@@ -54,6 +55,7 @@ public class ConsultaService {
 
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
+        consulta.setDiaSemana(consulta.getData().getDayOfWeek().getValue());
 
         validator.validar(consulta);
         return mapper.toDTO(consultaRepository.save(consulta));

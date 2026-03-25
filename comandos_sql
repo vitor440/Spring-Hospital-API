@@ -66,3 +66,5 @@ create table registro_medico(
     diagnostico varchar(300) not null,
     tratamento varchar(300) not null
 );
+
+alter table consulta add dia_semana integer;

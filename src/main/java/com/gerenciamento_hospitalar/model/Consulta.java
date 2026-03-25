@@ -32,6 +32,9 @@ public class Consulta {
     @Column(name = "hora")
     private LocalTime hora;
 
+    @Column(name = "dia_semana")
+    private Integer diaSemana;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private StatusConsulta status;

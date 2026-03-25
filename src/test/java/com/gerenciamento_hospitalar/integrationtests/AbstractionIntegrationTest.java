@@ -2,7 +2,6 @@ package com.gerenciamento_hospitalar.integrationtests;
 
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,14 +16,14 @@ public class AbstractionIntegrationTest {
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-        private PostgreSQLContainer<?> postgreSQL = new PostgreSQLContainer<>("postgres:15.17");
+        static PostgreSQLContainer<?> postgreSQL = new PostgreSQLContainer<>("postgres:15.17");
 
-        public void startable() {
+        public static void startable() {
             Startables.deepStart(Stream.of(postgreSQL)).join();
         }
 
 
-        public Map<String, String> propertiesSources() {
+        public static Map<String, String> propertiesSources() {
             return Map.of("spring.datasource.url", postgreSQL.getJdbcUrl(),
                     "spring.datasource.username", postgreSQL.getUsername(),
                     "spring.datasource.password", postgreSQL.getPassword());
@@ -32,8 +31,8 @@ public class AbstractionIntegrationTest {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-
             startable();
+
             ConfigurableEnvironment environment = applicationContext.getEnvironment();
             MapPropertySource mapPropertySource = new MapPropertySource("testcontainers", (Map) propertiesSources());
 

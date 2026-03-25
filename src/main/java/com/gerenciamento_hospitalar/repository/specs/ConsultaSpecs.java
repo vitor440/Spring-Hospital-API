@@ -13,7 +13,8 @@ public class ConsultaSpecs {
         return (root, query, cb) ->
                 cb.and(
                         cb.equal(root.get("medico"), medico),
-                        cb.equal(cb.function("date_part", Integer.class, cb.literal("dow"), root.get("data")), diaSemana),
+//                        cb.equal(cb.function("date_part", Integer.class, cb.literal("dow"), root.get("data")), diaSemana),
+                        cb.equal(root.get("diaSemana"), diaSemana),
                         cb.between(root.get("hora"), horaInicio, horaFim)
                 );
     }
