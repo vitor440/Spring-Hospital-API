@@ -14,7 +14,14 @@ import com.gerenciamento_hospitalar.repository.PacienteRepository;
 import com.gerenciamento_hospitalar.validator.ConsultaValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static org.springframework.data.domain.Sort.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +49,14 @@ public class ConsultaService {
         return mapper.toDTO(consultaRepository.save(consulta));
     }
 
+    public Page<ConsultaResponse> listarConsultas(int pagina, int tamanho, String direction) {
+
+        var sort = direction.equalsIgnoreCase("asc") ? Direction.ASC : Direction.DESC;
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "data");
+        Page<Consulta> consultas = consultaRepository.findAll(pageable);
+
+        return consultas.map(mapper::toDTO);
+    }
 
     public ConsultaResponse atualizarConsulta(Long id, ConsultaRequest request) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(id);

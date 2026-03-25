@@ -22,14 +22,14 @@ public class ConsultaValidator {
 
     public void validar(Consulta consulta) {
         if(datasConflitantes(consulta)) {
-            throw new ConsultasConflitantesException("Consulta conflitante com outra!");
+            throw new ConsultasConflitantesException("Já existe consulta nessa data e horario!");
         }
 
         if(horarioForaDoPadrao(consulta)) {
             throw new HoraForaDoPadraoException("Horário da consulta não segue o padrão especificado!");
         }
 
-        if(medicoIndisponivel(consulta)) {
+        if(!medicoIndisponivel(consulta)) {
             throw new ConsultasConflitantesException("Médico não disponível!");
         }
     }
@@ -58,11 +58,7 @@ public class ConsultaValidator {
     }
 
     private boolean medicoIndisponivel(Consulta consulta) {
-        int diaSemana = consulta.getData().getDayOfWeek().getValue();
-
-        Specification<DisponibilidadeMedico> specs = DisponibilidadeMedicoSpecs
-                .verificaDisponibilidade(consulta.getMedico(), diaSemana, consulta.getHora());
-
-        return !disponibilidadeMedicoRepository.exists(specs);
+        return disponibilidadeMedicoRepository
+                .verificaDisponibilidade(consulta.getMedico(), consulta.getDiaSemana(), consulta.getHora());
     }
  }

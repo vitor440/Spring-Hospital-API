@@ -1,15 +1,15 @@
 package com.gerenciamento_hospitalar.validator;
 
 import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
-import com.gerenciamento_hospitalar.model.Consulta;
+import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.model.DisponibilidadeMedico;
+import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.DisponibilidadeMedicoRepository;
-import com.gerenciamento_hospitalar.repository.specs.ConsultaSpecs;
-import com.gerenciamento_hospitalar.repository.specs.DisponibilidadeMedicoSpecs;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalTime;
 
 @Component
 @RequiredArgsConstructor
@@ -20,26 +20,28 @@ public class DisponibilidadeMedicoValidator {
 
     public void validar(DisponibilidadeMedico disponibilidadeMedico) {
         if(verificaSobreposicao(disponibilidadeMedico)) {
-            throw new RuntimeException("sdsadsad");
+            throw new RegistroDuplicadoException("conflito entre disponibilidades!");
         }
     }
 
     private boolean verificaSobreposicao(DisponibilidadeMedico disponibilidadeMedico) {
+        Medico medico = disponibilidadeMedico.getMedico();
+        int diaSemana = disponibilidadeMedico.getDiaSemana();
+        LocalTime horaInicio = disponibilidadeMedico.getHoraInicio();
+        LocalTime horaFim = disponibilidadeMedico.getHoraFim();
 
-        Specification<DisponibilidadeMedico> specs = DisponibilidadeMedicoSpecs
-                .verificaSobreposicao(disponibilidadeMedico.getMedico(), disponibilidadeMedico.getDiaSemana(),
-                        disponibilidadeMedico.getHoraInicio(), disponibilidadeMedico.getHoraFim());
-
-        return disponibilidadeMedicoRepository.exists(specs);
+        return disponibilidadeMedicoRepository
+                .verificaSobreposicao(medico, diaSemana, horaInicio, horaFim);
     }
 
     public void validarDelecao(DisponibilidadeMedico disponibilidadeMedico) {
-        Specification<Consulta> specs = ConsultaSpecs
-                .verificaDelecao(disponibilidadeMedico.getMedico(), disponibilidadeMedico.getDiaSemana(),
-                        disponibilidadeMedico.getHoraInicio(), disponibilidadeMedico.getHoraFim());
+        Medico medico = disponibilidadeMedico.getMedico();
+        int diaSemana = disponibilidadeMedico.getDiaSemana();
+        LocalTime horaInicio = disponibilidadeMedico.getHoraInicio();
+        LocalTime horaFim = disponibilidadeMedico.getHoraFim();
 
-        if(consultaRepository.exists(specs)) {
-            throw new DelecaoNaoPermitidaException("Deleção não permitida");
+        if(consultaRepository.existeConsulta(medico, diaSemana, horaInicio, horaFim)) {
+            throw new DelecaoNaoPermitidaException("Não é permitido excluir disponibilidade com consultas registradas no mesmo periodo!");
         }
     }
 }

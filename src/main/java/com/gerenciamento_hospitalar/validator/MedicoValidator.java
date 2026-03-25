@@ -37,7 +37,7 @@ public class MedicoValidator {
 
     public void validarDelecao(Medico medico) {
         if (consultaRepository.existsByMedico(medico)) {
-            throw new DelecaoNaoPermitidaException("Não é permitido a exclusão de médicos com consultas ativas!");
+            throw new DelecaoNaoPermitidaException("Não é permitido a exclusão de médicos com consultas cadastradas!");
         }
     }
 }

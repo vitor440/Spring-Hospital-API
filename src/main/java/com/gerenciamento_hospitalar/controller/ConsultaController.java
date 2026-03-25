@@ -5,7 +5,7 @@ import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.service.ConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,6 +42,17 @@ public class ConsultaController {
 
         return ResponseEntity.ok(service.obterConsultaPeloId(id));
     }
+
+    @GetMapping
+    public ResponseEntity<Page<ConsultaResponse>> obterConsultaPeloId(
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "6") int tamanho,
+            @RequestParam(value = "direction", defaultValue = "desc") String direction
+    ) {
+
+        return ResponseEntity.ok(service.listarConsultas(pagina, tamanho, direction));
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ConsultaResponse> deletarConsultaPeloId(@PathVariable("id") Long id) {
