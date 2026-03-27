@@ -2,12 +2,14 @@ package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "consulta")
+@ToString(exclude = "prescricao")
 @Data
 public class Consulta {
 
@@ -38,4 +40,7 @@ public class Consulta {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private StatusConsulta status;
+
+    @OneToOne(mappedBy = "consulta")
+    private Prescricao prescricao;
 }

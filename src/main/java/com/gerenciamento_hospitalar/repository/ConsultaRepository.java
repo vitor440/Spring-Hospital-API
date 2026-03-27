@@ -3,9 +3,13 @@ package com.gerenciamento_hospitalar.repository;
 import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.model.Paciente;
+import com.gerenciamento_hospitalar.model.StatusConsulta;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,4 +32,9 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
         AND c.hora BETWEEN :horaInicio AND :horaFim
     """)
     boolean existeConsulta(Medico medico, int diaSemana, LocalTime horaInicio, LocalTime horaFim);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Consulta c SET c.status = :status WHERE c.id = :id")
+    void modificaStatusConsulta(@Param("id") Long id, @Param("status") StatusConsulta status);
 }

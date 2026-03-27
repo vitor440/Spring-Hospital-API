@@ -1,0 +1,1 @@
+alter table resultado_consulta add prescricao_id bigint references prescricao(id) unique not null;

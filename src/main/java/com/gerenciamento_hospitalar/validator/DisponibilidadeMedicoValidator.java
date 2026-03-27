@@ -20,7 +20,7 @@ public class DisponibilidadeMedicoValidator {
 
     public void validar(DisponibilidadeMedico disponibilidadeMedico) {
         if(verificaSobreposicao(disponibilidadeMedico)) {
-            throw new RegistroDuplicadoException("conflito entre disponibilidades!");
+            throw new RegistroDuplicadoException("Conflito de disponibilidade: o horário informado se sobrepõe a outro já cadastrado para o médico neste dia.");
         }
     }
 
@@ -41,7 +41,7 @@ public class DisponibilidadeMedicoValidator {
         LocalTime horaFim = disponibilidadeMedico.getHoraFim();
 
         if(consultaRepository.existeConsulta(medico, diaSemana, horaInicio, horaFim)) {
-            throw new DelecaoNaoPermitidaException("Não é permitido excluir disponibilidade com consultas registradas no mesmo periodo!");
+            throw new DelecaoNaoPermitidaException("Disponibilidade não pode ser excluída pois há consultas agendadas para o médico neste dia e horário.");
         }
     }
 }

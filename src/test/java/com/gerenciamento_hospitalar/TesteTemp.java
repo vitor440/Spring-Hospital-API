@@ -13,11 +13,32 @@ import java.util.stream.Collectors;
 
 public class TesteTemp {
 
+    private List<String> stringToList(String string) {
+        return List.of(string.split(","));
+    }
+
+//    private String ListToString(List<String> lista) {
+//
+//    }
+
     @Test
     void teste () {
 
-       LocalDate data = LocalDate.of(2026, 3, 16);
+       String string = "dor de ouvido, sudorese";
 
-        System.out.println(data.getDayOfWeek().getValue());
+       List<String> lista = List.of(string.split(","));
+
+        System.out.println(string);
+        System.out.println(lista);
+        System.out.println(new StringBuilder(lista.toArray().toString()).toString());
+        String teste = "";
+        for (String s : lista) {
+            teste = teste + s + ",";
+        }
+
+        String.join(",", lista);
+        System.out.println(String.join(",", lista));
+
+
     }
 }

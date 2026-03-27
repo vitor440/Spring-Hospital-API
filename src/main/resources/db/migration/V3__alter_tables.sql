@@ -1,1 +1,0 @@
-alter table consulta add dia_semana integer;

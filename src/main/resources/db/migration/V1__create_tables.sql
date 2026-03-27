@@ -38,12 +38,15 @@ create table consulta(
      data date not null,
      hora time not null,
      status varchar(30) not null,
+     dia_semana integer not null,
      constraint chk_status check(status in ('AGENDADA','REALIZADA','CANCELADA','FALTANTE'))
 );
 
 
 create table prescricao(
    id bigint generated always as identity primary key,
+   medico_id bigint not null,
+   paciente_id bigint not null,
    consulta_id bigint not null references consulta(id) not null,
    data_prescricao date not null,
    comentarios varchar(500)
@@ -60,10 +63,15 @@ create table medicamento(
 
 create table resultado_consulta(
    id bigint generated always as identity primary key,
+   medico_id bigint not null,
+   paciente_id bigint not null,
    consulta_id bigint references consulta(id) unique not null,
+   sintomas varchar(500),
    diagnostico varchar(300),
    tratamento varchar(300),
-   data_retorno date
+   notas varchar(300),
+   data_retorno date,
+   data_criaca timestamp
 );
 
 create table prescricao_medicamento(

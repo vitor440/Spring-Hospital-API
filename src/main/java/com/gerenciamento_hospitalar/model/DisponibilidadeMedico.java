@@ -14,6 +14,10 @@ public class DisponibilidadeMedico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "medico_id")
+    private Medico medico;
+
     @Column(name = "dia_semana")
     private Integer diaSemana;
 
@@ -23,7 +27,4 @@ public class DisponibilidadeMedico {
     @Column(name = "hora_fim")
     private LocalTime horaFim;
 
-    @ManyToOne
-    @JoinColumn(name = "medico_id")
-    private Medico medico;
 }
