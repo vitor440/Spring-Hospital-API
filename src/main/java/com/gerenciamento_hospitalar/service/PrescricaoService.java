@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction;
@@ -31,23 +32,33 @@ public class PrescricaoService {
     private final PrescricaoRepository prescricaoRepository;
     private final ConsultaRepository consultaRepository;
     private final MedicamentoRepository medicamentoRepository;
-    private final PrescricaoMedicamentoRepository prescricaoMedicamentoRepository;
     private final PrescricaoMapper mapper;
-
-//    public PrescricaoResponse create(PrescricaoRequest request) {
-//        Prescricao prescricao = mapper.toEntity(request);
-//        Consulta consulta = obterConsultaPorIdOuLancarExcecao(request.consultaId());
-//        prescricao.setConsulta(consulta);
-//        prescricao.setMedicoId(consulta.getMedico().getId());
-//        prescricao.setPacienteId(consulta.getPaciente().getId());
-//        List<PrescricaoMedicamento> medicamentos = prescricao.getMedicamentos();
-//
-//        for (PrescricaoMedicamento medicamento : medicamentos) {
-//            medicamento.setPrescricao(prescricao);
-//        }
-//
-//        return mapper.toDTO(prescricaoRepository.save(prescricao));
-//    }
+    private final PrescricaoMedicamentoMapper prescricaoMedicamentoMapper;
+    
+    /*
+    *
+    * {
+    *   "consultaId": <Long>,
+    *   "dataPrescricao": <LocalDate>,
+    *   "comentarios": <String>,
+    *   "medicamentos":
+    *   {
+    *       "prescricaoId": <Long>,
+    *       "medicamentoId": <Long>,
+    *       "dosagem": <String>,
+    *       "frequencia": <String>,
+    *       "duracao": <String>
+    *   },
+    *   {
+     *       "prescricaoId": <Long>,
+     *       "medicamentoId": <Long>,
+     *       "dosagem": <String>,
+     *       "frequencia": <String>,
+     *       "duracao": <String>
+     *   }
+    * }
+    *
+    * */
 
     public PrescricaoResponse create(PrescricaoRequest request) {
         Prescricao prescricao = mapper.toEntity(request);
@@ -56,25 +67,18 @@ public class PrescricaoService {
         prescricao.setMedicoId(consulta.getMedico().getId());
         prescricao.setPacienteId(consulta.getPaciente().getId());
 
+        prescricao.setMedicamentos(new ArrayList<>());
+        for (PrescricaoMedicamentoRequest prescMedicamento : request.medicamentos()) {
+            PrescricaoMedicamento prescricaoMedicamento = prescricaoMedicamentoMapper.toEntity(prescMedicamento);
 
-        Prescricao response = prescricaoRepository.save(prescricao);
+            Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(prescMedicamento.medicamentoId());
+            prescricaoMedicamento.setMedicamento(medicamento);
+            prescricaoMedicamento.setPrescricao(prescricao);
+            prescricao.getMedicamentos().add(prescricaoMedicamento);
 
-        if(!prescricao.getMedicamentos().isEmpty() || prescricao.getMedicamentos() != null) {
-            List<PrescricaoMedicamento> medicamentos = prescricao.getMedicamentos();
-
-            for (int i = 0; i < medicamentos.size(); i++) {
-                PrescricaoMedicamento prescricaoMedicamento = medicamentos.get(i);
-                prescricaoMedicamento.setPrescricao(response);
-
-                Medicamento medicamento = medicamentoRepository.findById(request.medicamentos().get(i).medicamentoId())
-                        .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe medicamento com esse ID!"));
-
-                prescricaoMedicamento.setMedicamento(medicamento);
-
-                prescricaoMedicamentoRepository.save(prescricaoMedicamento);
-            }
         }
-        return mapper.toDTO(response);
+
+        return mapper.toDTO(prescricaoRepository.save(prescricao));
     }
 
 
@@ -125,5 +129,10 @@ public class PrescricaoService {
     private Consulta obterConsultaPorIdOuLancarExcecao(Long id) {
         return consultaRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe consulta com esse ID!"));
+    }
+
+    private Medicamento obterMedicamentoPeloIdOuLancarExcecao(Long id) {
+        return medicamentoRepository.findById(id)
+                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe medicamento com esse ID!"));
     }
 }

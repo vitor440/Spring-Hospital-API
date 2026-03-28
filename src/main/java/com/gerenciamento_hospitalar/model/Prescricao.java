@@ -37,6 +37,6 @@ public class Prescricao {
     @Column(name = "comentarios")
     private String comentarios;
 
-    @OneToMany(mappedBy = "prescricao")
+    @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL)
     private List<PrescricaoMedicamento> medicamentos;
 }
