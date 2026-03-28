@@ -1,8 +1,12 @@
 package com.gerenciamento_hospitalar.controller;
 
 import com.gerenciamento_hospitalar.dto.request.ConsultaRequest;
+import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
+import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
+import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.service.ConsultaService;
+import com.gerenciamento_hospitalar.service.ResultadoConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +22,7 @@ import java.net.URI;
 public class ConsultaController {
 
     private final ConsultaService service;
+    private final ResultadoConsultaService resultadoConsultaService;
 
     @PostMapping
     public ResponseEntity<ConsultaResponse> agendarConsulta(@RequestBody @Valid ConsultaRequest request) {
@@ -33,13 +38,11 @@ public class ConsultaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ConsultaResponse> atualizarConsulta(@PathVariable("id") Long id, @RequestBody @Valid ConsultaRequest request) {
-
         return ResponseEntity.ok(service.atualizarConsulta(id, request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ConsultaResponse> obterConsultaPeloId(@PathVariable("id") Long id) {
-
         return ResponseEntity.ok(service.obterConsultaPeloId(id));
     }
 
@@ -56,9 +59,27 @@ public class ConsultaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ConsultaResponse> deletarConsultaPeloId(@PathVariable("id") Long id) {
-
         service.deletarConsultaPeloId(id);
-
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/resultado")
+    public ResponseEntity<ResultadoConsultaResponse> create(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
+        ResultadoConsultaResponse response = resultadoConsultaService.create(request, consultaId);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping("/{id}/resultado")
+    public ResponseEntity<ResultadoConsultaResponse> getById(@PathVariable("id") Long consultaId) {
+
+        return ResponseEntity.ok(resultadoConsultaService.getByConsultaId(consultaId));
+    }
+
+
 }

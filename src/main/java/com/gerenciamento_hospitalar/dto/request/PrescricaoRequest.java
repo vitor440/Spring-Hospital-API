@@ -9,8 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record PrescricaoRequest(
-        @NotNull
-        Long consultaId,
+        //@NotNull
+        //Long consultaId,
         @NotNull
         LocalDate dataPrescricao,
         @NotBlank

@@ -22,17 +22,17 @@ public class ResultadoConsultaController {
 
     private final ResultadoConsultaService service;
 
-    @PostMapping
-    public ResponseEntity<ResultadoConsultaResponse> create(@RequestBody ResultadoConsultaRequest request) {
-        ResultadoConsultaResponse response = service.create(request);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(response);
-    }
+//    @PostMapping
+//    public ResponseEntity<ResultadoConsultaResponse> create(@RequestBody ResultadoConsultaRequest request) {
+//        ResultadoConsultaResponse response = service.create(request);
+//
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(response.id())
+//                .toUri();
+//
+//        return ResponseEntity.created(location).body(response);
+//    }
 
 //    @PutMapping("/{id}")
 //    public ResponseEntity<ResultadoConsultaResponse> update(@PathVariable("id") Long id, @RequestBody ResultadoConsultaRequest request) {

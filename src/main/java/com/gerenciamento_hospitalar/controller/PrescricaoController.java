@@ -20,22 +20,22 @@ public class PrescricaoController {
 
     private final PrescricaoService service;
 
-    @PostMapping
-    public ResponseEntity<PrescricaoResponse> create(@RequestBody @Valid PrescricaoRequest request) {
-        PrescricaoResponse response = service.create(request);
+//    @PostMapping
+//    public ResponseEntity<PrescricaoResponse> create(@RequestBody @Valid PrescricaoRequest request) {
+//        PrescricaoResponse response = service.create(request);
+//
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(response.id())
+//                .toUri();
+//
+//        return ResponseEntity.created(location).body(response);
+//    }
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PrescricaoResponse> atualizar(@PathVariable("id") Long id, @RequestBody @Valid PrescricaoRequest request) {
-        return ResponseEntity.ok(service.atualizar(id, request));
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<PrescricaoResponse> atualizar(@PathVariable("id") Long id, @RequestBody @Valid PrescricaoRequest request) {
+//        return ResponseEntity.ok(service.atualizar(id, request));
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<PrescricaoResponse> obterPrescricaoPeloId(@PathVariable("id") Long id) {

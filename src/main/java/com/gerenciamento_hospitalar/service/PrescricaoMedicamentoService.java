@@ -29,14 +29,7 @@ public class PrescricaoMedicamentoService implements IPrescricaoMedicamentoServi
 
     @Override
     public PrescricaoMedicamentoResponse create(PrescricaoMedicamentoRequest request) {
-        PrescricaoMedicamento prescricaoMedicamento = mapper.toEntity(request);
-
-        Prescricao prescricao = obterPrescricaoPorIdOuLancarExcecao(request.prescricaoId());
-        Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(request.medicamentoId());
-        prescricaoMedicamento.setPrescricao(prescricao);
-        prescricaoMedicamento.setMedicamento(medicamento);
-
-        return mapper.toDTO(prescricaoMedicamentoRepository.save(prescricaoMedicamento));
+        return null;
     }
 
     @Override
@@ -54,17 +47,7 @@ public class PrescricaoMedicamentoService implements IPrescricaoMedicamentoServi
 
     @Override
     public PrescricaoMedicamentoResponse update(Long id, PrescricaoMedicamentoRequest request) {
-        PrescricaoMedicamento prescricaoMedicamento = obterPrescricaoMedicamentoPeloIdOuLancarExcecao(id);
-
-        Prescricao prescricao = obterPrescricaoPorIdOuLancarExcecao(request.prescricaoId());
-        Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(request.medicamentoId());
-        prescricaoMedicamento.setPrescricao(prescricao);
-        prescricaoMedicamento.setMedicamento(medicamento);
-        prescricaoMedicamento.setDosagem(request.dosagem());
-        prescricaoMedicamento.setDuracao(request.duracao());
-        prescricaoMedicamento.setFrequencia(request.frequencia());
-
-        return mapper.toDTO(prescricaoMedicamentoRepository.save(prescricaoMedicamento));
+        return null;
     }
 
     @Override

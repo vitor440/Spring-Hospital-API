@@ -60,26 +60,26 @@ public class PrescricaoService {
     *
     * */
 
-    public PrescricaoResponse create(PrescricaoRequest request) {
-        Prescricao prescricao = mapper.toEntity(request);
-        Consulta consulta = obterConsultaPorIdOuLancarExcecao(request.consultaId());
-        prescricao.setConsulta(consulta);
-        prescricao.setMedicoId(consulta.getMedico().getId());
-        prescricao.setPacienteId(consulta.getPaciente().getId());
-
-        prescricao.setMedicamentos(new ArrayList<>());
-        for (PrescricaoMedicamentoRequest prescMedicamento : request.medicamentos()) {
-            PrescricaoMedicamento prescricaoMedicamento = prescricaoMedicamentoMapper.toEntity(prescMedicamento);
-
-            Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(prescMedicamento.medicamentoId());
-            prescricaoMedicamento.setMedicamento(medicamento);
-            prescricaoMedicamento.setPrescricao(prescricao);
-            prescricao.getMedicamentos().add(prescricaoMedicamento);
-
-        }
-
-        return mapper.toDTO(prescricaoRepository.save(prescricao));
-    }
+//    public PrescricaoResponse create(PrescricaoRequest request) {
+//        Prescricao prescricao = mapper.toEntity(request);
+//        Consulta consulta = obterConsultaPorIdOuLancarExcecao(request.consultaId());
+//        prescricao.setConsulta(consulta);
+//        prescricao.setMedicoId(consulta.getMedico().getId());
+//        prescricao.setPacienteId(consulta.getPaciente().getId());
+//
+//        prescricao.setMedicamentos(new ArrayList<>());
+//        for (PrescricaoMedicamentoRequest prescMedicamento : request.medicamentos()) {
+//            PrescricaoMedicamento prescricaoMedicamento = prescricaoMedicamentoMapper.toEntity(prescMedicamento);
+//
+//            Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(prescMedicamento.medicamentoId());
+//            prescricaoMedicamento.setMedicamento(medicamento);
+//            prescricaoMedicamento.setPrescricao(prescricao);
+//            prescricao.getMedicamentos().add(prescricaoMedicamento);
+//
+//        }
+//
+//        return mapper.toDTO(prescricaoRepository.save(prescricao));
+//    }
 
 
 
@@ -102,18 +102,18 @@ public class PrescricaoService {
 
 
 
-    public PrescricaoResponse atualizar(Long id, PrescricaoRequest request) {
-        Prescricao prescricao = obterPrescricaoPorIdOuLancarExcecao(id);
-        Consulta consulta = obterConsultaPorIdOuLancarExcecao(request.consultaId());
-
-        prescricao.setConsulta(consulta);
-        prescricao.setMedicoId(consulta.getMedico().getId());
-        prescricao.setPacienteId(consulta.getPaciente().getId());
-        prescricao.setDataPrescricao(request.dataPrescricao());
-        prescricao.setComentarios(request.comentarios());
-
-        return mapper.toDTO(prescricaoRepository.save(prescricao));
-    }
+//    public PrescricaoResponse atualizar(Long id, PrescricaoRequest request) {
+//        Prescricao prescricao = obterPrescricaoPorIdOuLancarExcecao(id);
+//        Consulta consulta = obterConsultaPorIdOuLancarExcecao(request.consultaId());
+//
+//        prescricao.setConsulta(consulta);
+//        prescricao.setMedicoId(consulta.getMedico().getId());
+//        prescricao.setPacienteId(consulta.getPaciente().getId());
+//        prescricao.setDataPrescricao(request.dataPrescricao());
+//        prescricao.setComentarios(request.comentarios());
+//
+//        return mapper.toDTO(prescricaoRepository.save(prescricao));
+//    }
 
     public void deletarPeloId(Long id) {
         Prescricao prescricao = obterPrescricaoPorIdOuLancarExcecao(id);

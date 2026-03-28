@@ -42,5 +42,7 @@ public class Consulta {
     private StatusConsulta status;
 
     @OneToOne(mappedBy = "consulta")
-    private Prescricao prescricao;
+    private ResultadoConsulta resultadoConsulta;
+
+
 }

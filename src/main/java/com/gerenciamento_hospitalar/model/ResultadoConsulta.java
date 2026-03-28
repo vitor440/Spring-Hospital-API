@@ -36,7 +36,7 @@ public class ResultadoConsulta {
     private Prescricao prescricao;
 
     @Type(ListArrayType.class)
-    @Column(name = "sintomas", columnDefinition = "varchar[]")
+    @Column(name = "sintomas", columnDefinition = "text[]")
     private List<String> sintomas;
 
     @Column(name = "diagnostico")

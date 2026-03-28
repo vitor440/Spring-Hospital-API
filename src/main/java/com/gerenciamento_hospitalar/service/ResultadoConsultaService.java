@@ -1,21 +1,19 @@
 package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.PrescricaoMedicamentoRequest;
-import com.gerenciamento_hospitalar.dto.request.PrescricaoRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
-import com.gerenciamento_hospitalar.dto.response.PrescricaoResponse;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.ResultadoConsultaMapper;
 import com.gerenciamento_hospitalar.model.*;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.MedicamentoRepository;
-import com.gerenciamento_hospitalar.repository.PrescricaoRepository;
 import com.gerenciamento_hospitalar.repository.ResultadoConsultaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +24,12 @@ public class ResultadoConsultaService {
     private final MedicamentoRepository medicamentoRepository;
     private final ResultadoConsultaMapper mapper;
 
-    public ResultadoConsultaResponse create(ResultadoConsultaRequest request) {
+    public ResultadoConsultaResponse create(ResultadoConsultaRequest request, Long consultaId) {
         //PrescricaoRequest prescricaoRequest = request.prescricao();
         //prescricaoService.create(prescricaoRequest);
 
         ResultadoConsulta rs = mapper.toEntity(request);
-        Consulta consulta = obterConsultaPeloIdOuLancarExcecao(request.consultaId());
+        Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
         rs.setConsulta(consulta);
         rs.setMedicoId(consulta.getMedico().getId());
         rs.setPacienteId(consulta.getPaciente().getId());
@@ -67,6 +65,12 @@ public class ResultadoConsultaService {
     public void delete(Long id) {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
         resultadoConsultaRepository.delete(rs);
+    }
+
+    public ResultadoConsultaResponse getByConsultaId(Long consultaId) {
+        Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
+
+        return mapper.toDTO(consulta.getResultadoConsulta());
     }
 
     private Consulta obterConsultaPeloIdOuLancarExcecao(Long id) {
