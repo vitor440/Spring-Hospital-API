@@ -23,8 +23,6 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
 
     boolean existsByPaciente(Paciente paciente);
 
-    boolean existsByMedicoAndHoraBetween(Medico medico, LocalTime horaInicio, LocalTime horaFim);
-
     @Query("""
         SELECT count(c) > 0 FROM Consulta c WHERE
         c.medico = :medico 

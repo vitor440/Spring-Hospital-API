@@ -8,5 +8,4 @@ import java.util.Optional;
 
 public interface ResultadoConsultaRepository extends JpaRepository<ResultadoConsulta, Long> {
 
-    Optional<ResultadoConsulta> findByConsulta(Consulta consulta);
 }

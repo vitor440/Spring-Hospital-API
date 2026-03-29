@@ -1,14 +1,13 @@
 package com.gerenciamento_hospitalar.service;
 
-import com.gerenciamento_hospitalar.mapper.DepartamentoMapper;
 import com.gerenciamento_hospitalar.dto.request.DepartamentoRequest;
 import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
+import com.gerenciamento_hospitalar.mapper.DepartamentoMapper;
 import com.gerenciamento_hospitalar.model.Departamento;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.validator.DepartamentoValidator;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.cache.spi.DirectAccessRegion;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 

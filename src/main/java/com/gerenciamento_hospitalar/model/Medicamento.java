@@ -33,6 +33,6 @@ public class Medicamento {
     @Column(name = "estoque")
     private int estoque;
 
-    @OneToMany(mappedBy = "medicamento")
-    private List<PrescricaoMedicamento> prescricoes;
+//    @OneToMany(mappedBy = "medicamento")
+//    private List<PrescricaoMedicamento> prescricoes;
 }

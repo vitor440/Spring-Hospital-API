@@ -7,8 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record ResultadoConsultaRequest(//Long consultaId,
-                                       List<String> sintomas,
+public record ResultadoConsultaRequest(List<String> sintomas,
                                        String diagnostico,
                                        String notas,
                                        String tratamento,

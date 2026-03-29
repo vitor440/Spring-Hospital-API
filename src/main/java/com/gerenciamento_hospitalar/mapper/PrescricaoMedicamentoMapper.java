@@ -14,7 +14,6 @@ public interface PrescricaoMedicamentoMapper {
     PrescricaoMedicamento toEntity(PrescricaoMedicamentoRequest request);
 
     @Mapping(target = "prescricaoId", expression = "java( prescricaoMedicamento.getPrescricao().getId() )")
-    @Mapping(target = "medicamentoId", expression = "java( prescricaoMedicamento.getMedicamento().getId() )")
     PrescricaoMedicamentoResponse toDTO(PrescricaoMedicamento prescricaoMedicamento);
 
     List<PrescricaoMedicamento> toEntityList(List<PrescricaoMedicamentoRequest> requests);

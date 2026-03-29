@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface PrescricaoRepository extends JpaRepository<Prescricao, Long> {
 
-    @Query("SELECT p FROM Prescricao p WHERE p.consulta.id = :id")
-    List<Prescricao> listarPrescricoesPeloIdDaConsulta(Long id);
 }

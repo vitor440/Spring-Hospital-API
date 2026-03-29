@@ -18,9 +18,14 @@ public class PrescricaoMedicamento {
     @JoinColumn(name = "prescricao_id")
     private Prescricao prescricao;
 
-    @ManyToOne
-    @JoinColumn(name = "medicamento_id")
-    private Medicamento medicamento;
+    @Column(name = "nome_medicamento")
+    private String nome;
+
+    @Column(name = "tipo")
+    private String tipo;
+
+    @Column(name = "descricao")
+    private String descricao;
 
     @Column(name = "dosagem")
     private String dosagem;

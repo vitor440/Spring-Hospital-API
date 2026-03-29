@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "consulta")
-@ToString(exclude = "prescricao")
+@ToString(exclude = "resultadoConsulta")
 @Data
 public class Consulta {
 
@@ -41,8 +41,10 @@ public class Consulta {
     @Enumerated(EnumType.STRING)
     private StatusConsulta status;
 
-    @OneToOne(mappedBy = "consulta")
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL)
     private ResultadoConsulta resultadoConsulta;
 
+    @OneToOne(mappedBy = "consulta")
+    private Prescricao prescricao;
 
 }

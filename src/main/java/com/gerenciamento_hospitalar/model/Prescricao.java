@@ -39,4 +39,5 @@ public class Prescricao {
 
     @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL)
     private List<PrescricaoMedicamento> medicamentos;
+
 }

@@ -47,7 +47,7 @@ public class ConsultaController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ConsultaResponse>> obterConsultaPeloId(
+    public ResponseEntity<Page<ConsultaResponse>> listarConsultas(
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho,
             @RequestParam(value = "direction", defaultValue = "desc") String direction
@@ -79,6 +79,19 @@ public class ConsultaController {
     public ResponseEntity<ResultadoConsultaResponse> getById(@PathVariable("id") Long consultaId) {
 
         return ResponseEntity.ok(resultadoConsultaService.getByConsultaId(consultaId));
+    }
+
+    @PutMapping("/{id}/resultado")
+    public ResponseEntity<ResultadoConsultaResponse> update(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
+
+        return ResponseEntity.ok(resultadoConsultaService.update(consultaId, request));
+    }
+
+    @DeleteMapping("/{id}/resultado")
+    public ResponseEntity<ResultadoConsultaResponse> delete(@PathVariable("id") Long consultaId) {
+
+        resultadoConsultaService.delete(consultaId);
+        return ResponseEntity.noContent().build();
     }
 
 

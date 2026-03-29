@@ -8,12 +8,9 @@ import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.List;
 
-public record PrescricaoRequest(
-        //@NotNull
-        //Long consultaId,
-        @NotNull
-        LocalDate dataPrescricao,
-        @NotBlank
-        String comentarios,
-        List<PrescricaoMedicamentoRequest> medicamentos) {
+public record PrescricaoRequest(@NotNull
+                                LocalDate dataPrescricao,
+                                @NotBlank
+                                String comentarios,
+                                List<PrescricaoMedicamentoRequest> medicamentos) {
 }

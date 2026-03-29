@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +25,6 @@ public class ResultadoConsultaService {
     private final ResultadoConsultaMapper mapper;
 
     public ResultadoConsultaResponse create(ResultadoConsultaRequest request, Long consultaId) {
-        //PrescricaoRequest prescricaoRequest = request.prescricao();
-        //prescricaoService.create(prescricaoRequest);
 
         ResultadoConsulta rs = mapper.toEntity(request);
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
@@ -43,8 +41,9 @@ public class ResultadoConsultaService {
         for (PrescricaoMedicamentoRequest prescMedicamento : request.prescricao().medicamentos()) {
             PrescricaoMedicamento prescricaoMedicamento = new PrescricaoMedicamento();
 
-            Medicamento medicamento = obterMedicamentoPeloIdOuLancarExcecao(prescMedicamento.medicamentoId());
-            prescricaoMedicamento.setMedicamento(medicamento);
+            prescricaoMedicamento.setNome(prescMedicamento.nome());
+            prescricaoMedicamento.setTipo(prescMedicamento.tipo());
+            prescricaoMedicamento.setDescricao(prescMedicamento.descricao());
             prescricaoMedicamento.setDosagem(prescMedicamento.dosagem());
             prescricaoMedicamento.setFrequencia(prescMedicamento.frequencia());
             prescricaoMedicamento.setDuracao(prescMedicamento.duracao());
@@ -62,15 +61,82 @@ public class ResultadoConsultaService {
         return mapper.toDTO(rs);
     }
 
-    public void delete(Long id) {
-        ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
-        resultadoConsultaRepository.delete(rs);
+    public void delete(Long consultaId) {
+        Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
+
+        if(consulta.getResultadoConsulta() == null) {
+            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
+        }
+
+        ResultadoConsulta resultadoConsulta = consulta.getResultadoConsulta();
+        consulta.setResultadoConsulta(null);
+        consulta.setPrescricao(null);
+        resultadoConsulta.setConsulta(null);
+        resultadoConsultaRepository.delete(resultadoConsulta);
+    }
+
+
+    public ResultadoConsultaResponse update(Long consultaId, ResultadoConsultaRequest request) {
+        Consulta consulta =obterConsultaPeloIdOuLancarExcecao(consultaId);
+
+        if(consulta.getResultadoConsulta() == null) {
+            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
+        }
+
+        ResultadoConsulta resultadoConsulta = consulta.getResultadoConsulta();
+        resultadoConsulta.setSintomas(request.sintomas());
+        resultadoConsulta.setDiagnostico(request.diagnostico());
+        resultadoConsulta.setDataRetorno(request.dataRetorno());
+        resultadoConsulta.setNotas(request.notas());
+        resultadoConsulta.setTratamento(request.tratamento());
+
+        Prescricao prescricao = resultadoConsulta.getPrescricao();
+        prescricao.setDataPrescricao(request.prescricao().dataPrescricao());
+        prescricao.setComentarios(request.prescricao().comentarios());
+
+        List<PrescricaoMedicamentoRequest> medicamentosReq = request.prescricao().medicamentos();
+
+        atualizarMedicamentos(medicamentosReq, prescricao);
+
+        return mapper.toDTO(resultadoConsultaRepository.save(resultadoConsulta));
     }
 
     public ResultadoConsultaResponse getByConsultaId(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
 
+        if(consulta.getResultadoConsulta() == null) {
+            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
+        }
+
         return mapper.toDTO(consulta.getResultadoConsulta());
+    }
+
+    public void deleteByConsultaId(Long consultaId) {
+        Consulta consulta =obterConsultaPeloIdOuLancarExcecao(consultaId);
+
+        if(consulta.getResultadoConsulta() == null) {
+            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
+        }
+
+        resultadoConsultaRepository.delete(consulta.getResultadoConsulta());
+    }
+
+    private void atualizarMedicamentos(List<PrescricaoMedicamentoRequest> medicamentosReq, Prescricao prescricao) {
+
+        prescricao.getMedicamentos().clear();
+
+        for (PrescricaoMedicamentoRequest medicamentoRequest : medicamentosReq) {
+            PrescricaoMedicamento medicamento = new PrescricaoMedicamento();
+            medicamento.setNome(medicamentoRequest.nome());
+            medicamento.setTipo(medicamentoRequest.tipo());
+            medicamento.setDescricao(medicamentoRequest.descricao());
+            medicamento.setDosagem(medicamentoRequest.dosagem());
+            medicamento.setFrequencia(medicamentoRequest.frequencia());
+            medicamento.setDuracao(medicamentoRequest.duracao());
+
+            medicamento.setPrescricao(prescricao);
+            prescricao.getMedicamentos().add(medicamento);
+        }
     }
 
     private Consulta obterConsultaPeloIdOuLancarExcecao(Long id) {
