@@ -20,7 +20,7 @@ public class DisponibilidadeMedicoController {
 
     @PostMapping
     public ResponseEntity<DisponibilidadeMedicoResponse> addDisponibilidadeMedico(@RequestBody DisponibilidadeMedicoRequest request) {
-        DisponibilidadeMedicoResponse response = service.addDisponibilidadeMedico(request);
+        DisponibilidadeMedicoResponse response = service.addDisponibilidadeMedico2(request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -33,7 +33,7 @@ public class DisponibilidadeMedicoController {
     @PutMapping("/{id}")
     public ResponseEntity<DisponibilidadeMedicoResponse> atualizarDisponibilidade(@PathVariable("id") Long id,
                                                                                   @RequestBody DisponibilidadeMedicoRequest request) {
-        return ResponseEntity.ok(service.atualizarDisponibilidadeMedico(id, request));
+        return ResponseEntity.ok(service.atualizarDisponibilidadeMedico2(id, request));
     }
 
     @GetMapping("/{id}")
@@ -46,7 +46,7 @@ public class DisponibilidadeMedicoController {
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho) {
 
-        return ResponseEntity.ok(service.listarDisponibilidades(pagina, tamanho));
+        return ResponseEntity.ok(service.listarDisponibilidades2(pagina, tamanho));
     }
 
     @DeleteMapping("/{id}")

@@ -78,6 +78,9 @@ public class ConsultaService {
         return mapper.toDTO(obterConsultaPeloIdOuLancarExcecao(id));
     }
 
+    public void modificaStatusConsulta(Long id, StatusConsulta status) {
+        consultaRepository.modificaStatusConsulta(id, status);
+    }
 
     public void deletarConsultaPeloId(Long id) {
         consultaRepository.delete(obterConsultaPeloIdOuLancarExcecao(id));

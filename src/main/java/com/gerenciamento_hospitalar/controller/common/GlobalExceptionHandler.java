@@ -58,4 +58,12 @@ public class GlobalExceptionHandler {
     public ErroResposta DelecaoNaoPermitidaExceptionHandle(DelecaoNaoPermitidaException e) {
         return new ErroResposta(e.getMessage(), HttpStatus.CONFLICT.value(), List.of());
     }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErroResposta InvalidJwtAuthenticationExceptionHandle(InvalidJwtAuthenticationException e) {
+        return new ErroResposta(e.getMessage(), HttpStatus.FORBIDDEN.value(), List.of());
+    }
+
+
 }

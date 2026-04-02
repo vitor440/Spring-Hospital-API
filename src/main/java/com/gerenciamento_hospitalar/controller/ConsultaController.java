@@ -5,6 +5,7 @@ import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.model.Consulta;
+import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.service.ConsultaService;
 import com.gerenciamento_hospitalar.service.ResultadoConsultaService;
 import jakarta.validation.Valid;
@@ -94,5 +95,10 @@ public class ConsultaController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PatchMapping("/{id}/{stautus}")
+    public ResponseEntity<Void> modificaStatusConsulta(@PathVariable("id") Long id,
+                                                       @PathVariable("status")StatusConsulta status) {
+        service.modificaStatusConsulta(id, status);
+        return ResponseEntity.noContent().build();
+    }
 }
