@@ -4,7 +4,7 @@ import com.gerenciamento_hospitalar.exception.ConsultasConflitantesException;
 import com.gerenciamento_hospitalar.exception.HoraForaDoPadraoException;
 import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
-import com.gerenciamento_hospitalar.repository.DisponibilidadeMedicoRepository;
+import com.gerenciamento_hospitalar.repository.TurnoAtendimentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 public class ConsultaValidator {
 
     private final ConsultaRepository consultaRepository;
-    private final DisponibilidadeMedicoRepository disponibilidadeMedicoRepository;
+    private final TurnoAtendimentoRepository turnoAtendimentoRepository;
 
     public void validar(Consulta consulta) {
         if(datasConflitantes(consulta)) {
@@ -55,7 +55,7 @@ public class ConsultaValidator {
     }
 
     private boolean medicoIndisponivel(Consulta consulta) {
-        return disponibilidadeMedicoRepository
+        return turnoAtendimentoRepository
                 .verificaDisponibilidade(consulta.getMedico(), consulta.getDiaSemana(), consulta.getHora());
     }
  }

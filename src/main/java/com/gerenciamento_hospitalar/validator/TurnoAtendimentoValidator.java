@@ -1,0 +1,47 @@
+package com.gerenciamento_hospitalar.validator;
+
+import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
+import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
+import com.gerenciamento_hospitalar.model.TurnoAtendimento;
+import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.repository.ConsultaRepository;
+import com.gerenciamento_hospitalar.repository.TurnoAtendimentoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalTime;
+
+@Component
+@RequiredArgsConstructor
+public class TurnoAtendimentoValidator {
+
+    private final TurnoAtendimentoRepository turnoAtendimentoRepository;
+    private final ConsultaRepository consultaRepository;
+
+    public void validar(TurnoAtendimento turnoAtendimento) {
+        if(verificaSobreposicao(turnoAtendimento)) {
+            throw new RegistroDuplicadoException("Conflito de disponibilidade: o horário informado se sobrepõe a outro já cadastrado para o médico neste dia.");
+        }
+    }
+
+    private boolean verificaSobreposicao(TurnoAtendimento turnoAtendimento) {
+        Medico medico = turnoAtendimento.getMedico();
+        int diaSemana = turnoAtendimento.getDiaSemana();
+        LocalTime horaInicio = turnoAtendimento.getHoraInicio();
+        LocalTime horaFim = turnoAtendimento.getHoraFim();
+
+        return turnoAtendimentoRepository
+                .verificaSobreposicao(medico, diaSemana, horaInicio, horaFim);
+    }
+
+    public void validarDelecao(TurnoAtendimento turnoAtendimento) {
+        Medico medico = turnoAtendimento.getMedico();
+        int diaSemana = turnoAtendimento.getDiaSemana();
+        LocalTime horaInicio = turnoAtendimento.getHoraInicio();
+        LocalTime horaFim = turnoAtendimento.getHoraFim();
+
+        if(consultaRepository.existeConsulta(medico, diaSemana, horaInicio, horaFim)) {
+            throw new DelecaoNaoPermitidaException("Disponibilidade não pode ser excluída pois há consultas agendadas para o médico neste dia e horário.");
+        }
+    }
+}

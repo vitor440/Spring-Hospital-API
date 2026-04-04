@@ -1,4 +1,10 @@
 package com.gerenciamento_hospitalar.dto.security;
 
-public record CadastroUsuarioDTO(String username, String senha, String nomeCompleto) {
+import jakarta.validation.constraints.NotBlank;
+
+public record CadastroUsuarioDTO(@NotBlank(message = "campo obrigatório")
+                                 String username,
+                                 @NotBlank(message = "campo obrigatório")
+                                 String senha,
+                                 String nomeCompleto) {
 }

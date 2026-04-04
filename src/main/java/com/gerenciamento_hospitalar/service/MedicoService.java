@@ -95,7 +95,7 @@ public class MedicoService {
 
         List<Consulta> consultas = medico.getConsultas();
 
-        return consultas.stream().map(consultaMapper::toDTO).collect(Collectors.toList());
+        return consultas.stream().map(consultaMapper::toDTO).toList();
     }
 
     private Medico obterMedicoPeloIdOuLancarExcecao(Long id) {

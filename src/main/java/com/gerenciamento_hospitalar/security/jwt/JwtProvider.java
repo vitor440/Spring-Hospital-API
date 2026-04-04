@@ -108,7 +108,7 @@ public class JwtProvider {
 
     // obtém o token pelo header da requisição.
     public String resolveToken(HttpServletRequest request) {
-        String authentication = request.getHeader("Authentication");
+        String authentication = request.getHeader("Authorization");
 
         if(!StringUtils.isEmpty(authentication) && authentication.startsWith("Bearer ")) {
             return authentication.substring("Bearer ".length());

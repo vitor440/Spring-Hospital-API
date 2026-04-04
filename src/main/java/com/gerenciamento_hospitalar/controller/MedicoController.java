@@ -1,14 +1,22 @@
 package com.gerenciamento_hospitalar.controller;
 
-import com.gerenciamento_hospitalar.dto.request.DisponibilidadeMedicoRequest;
+import com.gerenciamento_hospitalar.controller.docs.MedicoControllerDocs;
+import com.gerenciamento_hospitalar.dto.ErroResposta;
+import com.gerenciamento_hospitalar.dto.request.TurnoAtendimentoRequest;
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
-import com.gerenciamento_hospitalar.dto.response.DisponibilidadeMedicoResponse;
+import com.gerenciamento_hospitalar.dto.response.TurnoAtendimentoResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
-import com.gerenciamento_hospitalar.model.DisponibilidadeMedico;
 import com.gerenciamento_hospitalar.model.Especialidade;
-import com.gerenciamento_hospitalar.service.DisponibilidadeMedicoService;
+import com.gerenciamento_hospitalar.service.TurnoAtendimentoService;
 import com.gerenciamento_hospitalar.service.MedicoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,12 +30,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/medicos")
 @RequiredArgsConstructor
-public class MedicoController {
+@Tag(name = "Médicos", description = "gerenciamento de médicos")
+public class MedicoController implements MedicoControllerDocs {
 
     private final MedicoService service;
-    private final DisponibilidadeMedicoService disponibilidadeMedicoService;
+    private final TurnoAtendimentoService turnoAtendimentoService;
 
     @PostMapping
+    @Override
     public ResponseEntity<MedicoResponse> addMedico(@RequestBody @Valid MedicoRequest request) {
         MedicoResponse response = service.addMedico(request);
 
@@ -40,40 +50,45 @@ public class MedicoController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<MedicoResponse> atualizarMedico(@PathVariable("id") Long id, @RequestBody @Valid MedicoRequest request) {
 
         return ResponseEntity.ok(service.atualizarMedico(id, request));
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<MedicoResponse> obterMedicoPeloId(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(service.obterMedicoPeloId(id));
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<Page<MedicoResponse>> listarMedicos(
             @RequestParam(value = "nome", required = false) String nome,
-            @RequestParam(value = "especialidade", required = false)Especialidade especialidade,
+            @RequestParam(value = "especialidade", required = false) Especialidade especialidade,
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
-            ) {
+    ) {
 
         return ResponseEntity.ok(service.ListarMedicos(nome, especialidade, pagina, tamanho, direction));
     }
 
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deletarMedicoPeloId(@PathVariable("id") Long id) {
 
         service.deletarMedicoPeloId(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/disponibilidades")
-    public ResponseEntity<DisponibilidadeMedicoResponse> addDisponibilidade(@PathVariable("id") Long id,
-                                                                            @RequestBody DisponibilidadeMedicoRequest request) {
-        DisponibilidadeMedicoResponse response = disponibilidadeMedicoService.addDisponibilidadeMedico(id, request);
+    @PostMapping("/{id}/turnos-atendimento")
+    @Override
+    public ResponseEntity<TurnoAtendimentoResponse> addTurnoMedico(@PathVariable("id") Long id,
+                                                                   @RequestBody TurnoAtendimentoRequest request) {
+        TurnoAtendimentoResponse response = turnoAtendimentoService.addDisponibilidadeMedico(id, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
@@ -82,34 +97,37 @@ public class MedicoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @GetMapping("/{id}/disponibilidades")
-    public ResponseEntity<List<DisponibilidadeMedicoResponse>> listarDisponibilidades(
+    @PutMapping("/{id}/turnos-atendimento/{turnoId}")
+    @Override
+    public ResponseEntity<TurnoAtendimentoResponse> atualizarTurnoMedico(@PathVariable("id") Long id,
+                                                                         @PathVariable("turnoId") Long turnoId,
+                                                                         @RequestBody TurnoAtendimentoRequest request) {
+        return ResponseEntity.ok(turnoAtendimentoService.atualizarDisponibilidadeMedico(id, turnoId, request));
+    }
+
+    @GetMapping("/{id}/turnos-atendimento")
+    @Override
+    public ResponseEntity<List<TurnoAtendimentoResponse>> listarTurnos(
             @PathVariable("id") Long id,
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho
     ) {
 
-        return ResponseEntity.ok(disponibilidadeMedicoService.listarDisponibilidades(id, pagina, tamanho));
+        return ResponseEntity.ok(turnoAtendimentoService.listarDisponibilidades(id, pagina, tamanho));
     }
 
-    @PutMapping("/{id}/disponibilidades/{disponibilidadeId}")
-    public ResponseEntity<DisponibilidadeMedicoResponse> obterDisponibilidadePeloId(@PathVariable("id") Long id,
-                                                                                    @PathVariable("disponibilidadeId") Long disponibilidadeId,
-                                                                                    @RequestBody DisponibilidadeMedicoRequest request) {
-        return ResponseEntity.ok(disponibilidadeMedicoService.atualizarDisponibilidadeMedico(id, disponibilidadeId, request));
-    }
-
-    @DeleteMapping("/{id}/disponibilidades/{disponibilidadeId}")
-    public ResponseEntity<DisponibilidadeMedicoResponse> obterDisponibilidadePeloId(@PathVariable("id") Long id,
-                                                                                    @PathVariable("disponibilidadeId") Long disponibilidadeId) {
-        disponibilidadeMedicoService.deletarPeloIdMedico(id, disponibilidadeId);
+    @DeleteMapping("/{id}/turnos-atendimento/{turnoId}")
+    @Override
+    public ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id,
+                                                                             @PathVariable("turnoId") Long turnoId) {
+        turnoAtendimentoService.deletarPeloIdMedico(id, turnoId);
         return ResponseEntity.noContent().build();
     }
 
 
     @GetMapping("/{id}/consultas")
+    @Override
     public ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id) {
-
         return ResponseEntity.ok(service.obterConsultas(id));
     }
 }

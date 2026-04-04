@@ -40,5 +40,5 @@ public class Medico {
     private List<Consulta> consultas;
 
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL)
-    private List<DisponibilidadeMedico> disponibilidades;
+    private List<TurnoAtendimento> disponibilidades;
 }

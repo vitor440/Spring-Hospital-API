@@ -14,7 +14,6 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
-@Component
 @RequiredArgsConstructor
 public class JwtFilter extends GenericFilterBean {
 

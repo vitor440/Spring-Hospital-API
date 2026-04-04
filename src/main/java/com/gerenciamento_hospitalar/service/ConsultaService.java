@@ -79,6 +79,7 @@ public class ConsultaService {
     }
 
     public void modificaStatusConsulta(Long id, StatusConsulta status) {
+        obterConsultaPeloIdOuLancarExcecao(id);
         consultaRepository.modificaStatusConsulta(id, status);
     }
 

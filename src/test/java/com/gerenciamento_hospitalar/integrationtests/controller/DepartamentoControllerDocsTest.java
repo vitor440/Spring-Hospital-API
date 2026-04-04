@@ -26,7 +26,7 @@ import static io.restassured.RestAssured.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class DepartamentoControllerTest extends AbstractionIntegrationTest {
+class DepartamentoControllerDocsTest extends AbstractionIntegrationTest {
 
     private DepartamentoRequest request;
     private DepartamentoResponse response;

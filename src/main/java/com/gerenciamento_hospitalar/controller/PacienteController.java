@@ -1,8 +1,17 @@
 package com.gerenciamento_hospitalar.controller;
 
+import com.gerenciamento_hospitalar.controller.docs.PacienteControllerDocs;
+import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
 import com.gerenciamento_hospitalar.service.PacienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,11 +24,13 @@ import java.net.URI;
 @RestController
 @RequestMapping("/pacientes")
 @RequiredArgsConstructor
-public class PacienteController {
+@Tag(name = "Pacientes", description = "gerenciamento de pacientes.")
+public class PacienteController implements PacienteControllerDocs {
 
     private final PacienteService service;
 
     @PostMapping
+    @Override
     public ResponseEntity<PacienteResponse> addPaciente(@RequestBody @Valid PacienteRequest request) {
         PacienteResponse response = service.addPaciente(request);
 
@@ -32,16 +43,19 @@ public class PacienteController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<PacienteResponse> atualizarPaciente(@PathVariable("id") Long id, @RequestBody @Valid PacienteRequest request) {
         return ResponseEntity.ok(service.atualizarPaciente(id, request));
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<PacienteResponse> obterPacientePeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterPacientePeloId(id));
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<Page<PacienteResponse>> listarPacientes(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "genero", required = false) String genero,
@@ -54,6 +68,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deletarPacientePeloId(@PathVariable("id") Long id) {
         service.deletarPaciente(id);
 

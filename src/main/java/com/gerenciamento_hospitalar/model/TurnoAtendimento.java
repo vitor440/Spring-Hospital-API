@@ -6,9 +6,9 @@ import lombok.Data;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "disponibilidade_medico")
+@Table(name = "turno_atendimento_medico")
 @Data
-public class DisponibilidadeMedico {
+public class TurnoAtendimento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

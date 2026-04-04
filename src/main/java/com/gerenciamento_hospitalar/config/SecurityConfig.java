@@ -1,6 +1,7 @@
 package com.gerenciamento_hospitalar.config;
 
 import com.gerenciamento_hospitalar.security.jwt.JwtFilter;
+import com.gerenciamento_hospitalar.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
+
+    private final JwtProvider jwtProvider;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -46,8 +48,9 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        JwtFilter filter = new JwtFilter(jwtProvider);
         return http
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorized ->
@@ -56,6 +59,8 @@ public class SecurityConfig {
                                 "/auth/refresh/**",
                                 "/auth/createUser",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs",
                                 "/v3/api-docs/**"
                         ).permitAll()
                                 .requestMatchers("/users").denyAll()

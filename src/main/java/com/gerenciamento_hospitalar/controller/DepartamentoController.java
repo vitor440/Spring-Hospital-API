@@ -1,8 +1,17 @@
 package com.gerenciamento_hospitalar.controller;
 
+import com.gerenciamento_hospitalar.controller.docs.DepartamentoControllerDocs;
+import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.DepartamentoRequest;
 import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
+import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.service.DepartamentoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,11 +24,13 @@ import java.net.URI;
 @RestController
 @RequestMapping("/departamentos")
 @RequiredArgsConstructor
-public class DepartamentoController {
+@Tag(name = "Departamentos", description = "gerenciamento de departamentos")
+public class DepartamentoController implements DepartamentoControllerDocs {
 
     private final DepartamentoService service;
 
     @PostMapping
+    @Override
     public ResponseEntity<DepartamentoResponse> addDepartamento(@RequestBody @Valid DepartamentoRequest request) {
         DepartamentoResponse response = service.addDepartamento(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -31,22 +42,20 @@ public class DepartamentoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DepartamentoResponse> atualizarDepartamento(@PathVariable("id") Long id, @RequestBody @Valid DepartamentoRequest request) {
+    @Override
+    public ResponseEntity<DepartamentoResponse> atualizarDepartamento(@PathVariable("id") Long id,
+                                                                      @RequestBody @Valid DepartamentoRequest request) {
         return ResponseEntity.ok(service.atualizarDepartamento(id, request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarDepartamentoPeloId(@PathVariable("id") Long id) {
-        service.deletarDepartamentoPeloId(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<DepartamentoResponse> obterDepartamentoPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterDepartamentoPeloId(id));
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<Page<DepartamentoResponse>> listarDepartamentos(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "localizacao", required = false) String localizacao,
@@ -55,6 +64,13 @@ public class DepartamentoController {
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
     ) {
         return ResponseEntity.ok(service.listarDepartamentos(nome, localizacao, pagina, tamanho, direction));
+    }
+
+    @DeleteMapping("/{id}")
+    @Override
+    public ResponseEntity<Void> deletarDepartamentoPeloId(@PathVariable("id") Long id) {
+        service.deletarDepartamentoPeloId(id);
+        return ResponseEntity.noContent().build();
     }
 
 

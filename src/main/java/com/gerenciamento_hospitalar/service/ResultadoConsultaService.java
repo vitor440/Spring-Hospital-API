@@ -101,6 +101,24 @@ public class ResultadoConsultaService {
         return mapper.toDTO(resultadoConsultaRepository.save(resultadoConsulta));
     }
 
+    private void atualizarMedicamentos(List<PrescricaoMedicamentoRequest> medicamentosReq, Prescricao prescricao) {
+
+        prescricao.getMedicamentos().clear();
+
+        for (PrescricaoMedicamentoRequest medicamentoRequest : medicamentosReq) {
+            PrescricaoMedicamento medicamento = new PrescricaoMedicamento();
+            medicamento.setNome(medicamentoRequest.nome());
+            medicamento.setTipo(medicamentoRequest.tipo());
+            medicamento.setDescricao(medicamentoRequest.descricao());
+            medicamento.setDosagem(medicamentoRequest.dosagem());
+            medicamento.setFrequencia(medicamentoRequest.frequencia());
+            medicamento.setDuracao(medicamentoRequest.duracao());
+
+            medicamento.setPrescricao(prescricao);
+            prescricao.getMedicamentos().add(medicamento);
+        }
+    }
+
     public ResultadoConsultaResponse getByConsultaId(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
 
@@ -119,24 +137,6 @@ public class ResultadoConsultaService {
         }
 
         resultadoConsultaRepository.delete(consulta.getResultadoConsulta());
-    }
-
-    private void atualizarMedicamentos(List<PrescricaoMedicamentoRequest> medicamentosReq, Prescricao prescricao) {
-
-        prescricao.getMedicamentos().clear();
-
-        for (PrescricaoMedicamentoRequest medicamentoRequest : medicamentosReq) {
-            PrescricaoMedicamento medicamento = new PrescricaoMedicamento();
-            medicamento.setNome(medicamentoRequest.nome());
-            medicamento.setTipo(medicamentoRequest.tipo());
-            medicamento.setDescricao(medicamentoRequest.descricao());
-            medicamento.setDosagem(medicamentoRequest.dosagem());
-            medicamento.setFrequencia(medicamentoRequest.frequencia());
-            medicamento.setDuracao(medicamentoRequest.duracao());
-
-            medicamento.setPrescricao(prescricao);
-            prescricao.getMedicamentos().add(medicamento);
-        }
     }
 
     private Consulta obterConsultaPeloIdOuLancarExcecao(Long id) {
