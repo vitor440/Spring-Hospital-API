@@ -4,10 +4,7 @@ import com.gerenciamento_hospitalar.dto.request.ConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
-import com.gerenciamento_hospitalar.model.Consulta;
-import com.gerenciamento_hospitalar.model.Medico;
-import com.gerenciamento_hospitalar.model.Paciente;
-import com.gerenciamento_hospitalar.model.StatusConsulta;
+import com.gerenciamento_hospitalar.model.*;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import com.gerenciamento_hospitalar.repository.PacienteRepository;
@@ -40,7 +37,7 @@ public class ConsultaService {
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
         consulta.setStatus(StatusConsulta.AGENDADA);
-        consulta.setDiaSemana(consulta.getData().getDayOfWeek().getValue());
+        consulta.setDiaSemana(DiaSemana.getDiaSemana(consulta.getData().getDayOfWeek().getValue()));
 
         validator.validar(consulta);
         return mapper.toDTO(consultaRepository.save(consulta));
@@ -67,7 +64,7 @@ public class ConsultaService {
 
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
-        consulta.setDiaSemana(consulta.getData().getDayOfWeek().getValue());
+        consulta.setDiaSemana(DiaSemana.getDiaSemana(consulta.getData().getDayOfWeek().getValue()));
 
         validator.validar(consulta);
         return mapper.toDTO(consultaRepository.save(consulta));

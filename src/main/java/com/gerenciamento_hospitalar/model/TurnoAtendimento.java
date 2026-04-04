@@ -19,7 +19,8 @@ public class TurnoAtendimento {
     private Medico medico;
 
     @Column(name = "dia_semana")
-    private Integer diaSemana;
+    @Enumerated(EnumType.STRING)
+    private DiaSemana diaSemana;
 
     @Column(name = "hora_inicio")
     private LocalTime horaInicio;

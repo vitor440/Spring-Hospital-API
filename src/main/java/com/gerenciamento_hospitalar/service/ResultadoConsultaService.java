@@ -4,15 +4,17 @@ import com.gerenciamento_hospitalar.dto.request.PrescricaoMedicamentoRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
+import com.gerenciamento_hospitalar.mapper.PrescricaoMapper;
+import com.gerenciamento_hospitalar.mapper.PrescricaoMedicamentoMapper;
 import com.gerenciamento_hospitalar.mapper.ResultadoConsultaMapper;
 import com.gerenciamento_hospitalar.model.*;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.MedicamentoRepository;
 import com.gerenciamento_hospitalar.repository.ResultadoConsultaRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,8 +25,11 @@ public class ResultadoConsultaService {
     private final ConsultaRepository consultaRepository;
     private final MedicamentoRepository medicamentoRepository;
     private final ResultadoConsultaMapper mapper;
+    private final PrescricaoMedicamentoMapper medicamentoMapper;
 
-    public ResultadoConsultaResponse create(ResultadoConsultaRequest request, Long consultaId) {
+
+    @Transactional
+    public ResultadoConsultaResponse gerarResultadoDaConsulta(ResultadoConsultaRequest request, Long consultaId) {
 
         ResultadoConsulta rs = mapper.toEntity(request);
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
@@ -32,36 +37,20 @@ public class ResultadoConsultaService {
         rs.setMedicoId(consulta.getMedico().getId());
         rs.setPacienteId(consulta.getPaciente().getId());
 
-        Prescricao prescricao = rs.getPrescricao();
-        prescricao.setConsulta(consulta);
-        prescricao.setMedicoId(consulta.getMedico().getId());
-        prescricao.setPacienteId(consulta.getPaciente().getId());
+        rs.getPrescricao().setConsulta(consulta);
+        rs.getPrescricao().setMedicoId(consulta.getMedico().getId());
+        rs.getPrescricao().setPacienteId(consulta.getPaciente().getId());
 
-        prescricao.setMedicamentos(new ArrayList<>());
-        for (PrescricaoMedicamentoRequest prescMedicamento : request.prescricao().medicamentos()) {
-            PrescricaoMedicamento prescricaoMedicamento = new PrescricaoMedicamento();
-
-            prescricaoMedicamento.setNome(prescMedicamento.nome());
-            prescricaoMedicamento.setTipo(prescMedicamento.tipo());
-            prescricaoMedicamento.setDescricao(prescMedicamento.descricao());
-            prescricaoMedicamento.setDosagem(prescMedicamento.dosagem());
-            prescricaoMedicamento.setFrequencia(prescMedicamento.frequencia());
-            prescricaoMedicamento.setDuracao(prescMedicamento.duracao());
-
-            prescricaoMedicamento.setPrescricao(prescricao);
-            prescricao.getMedicamentos().add(prescricaoMedicamento);
-
+        for (PrescricaoMedicamento medicamento : rs.getPrescricao().getMedicamentos()) {
+            medicamento.setPrescricao(rs.getPrescricao());
         }
 
         return mapper.toDTO(resultadoConsultaRepository.save(rs));
     }
 
-    public ResultadoConsultaResponse getById(Long id) {
-        ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
-        return mapper.toDTO(rs);
-    }
 
-    public void delete(Long consultaId) {
+
+    public void deletarResultadoDaConsulta(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
 
         if(consulta.getResultadoConsulta() == null) {
@@ -76,7 +65,7 @@ public class ResultadoConsultaService {
     }
 
 
-    public ResultadoConsultaResponse update(Long consultaId, ResultadoConsultaRequest request) {
+    public ResultadoConsultaResponse atualizarResultadoDaConsulta(Long consultaId, ResultadoConsultaRequest request) {
         Consulta consulta =obterConsultaPeloIdOuLancarExcecao(consultaId);
 
         if(consulta.getResultadoConsulta() == null) {
@@ -119,7 +108,35 @@ public class ResultadoConsultaService {
         }
     }
 
-    public ResultadoConsultaResponse getByConsultaId(Long consultaId) {
+    public ResultadoConsultaResponse atualizarResultadoDaConsulta2(Long consultaId, ResultadoConsultaRequest request) {
+        Consulta consulta =obterConsultaPeloIdOuLancarExcecao(consultaId);
+
+        if(consulta.getResultadoConsulta() == null) {
+            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
+        }
+
+        ResultadoConsulta rs = consulta.getResultadoConsulta();
+        rs.setSintomas(request.sintomas());
+        rs.setNotas(request.notas());
+        rs.setTratamento(request.tratamento());
+        rs.setDataRetorno(request.dataRetorno());
+        rs.setDiagnostico(request.diagnostico());
+
+        rs.getPrescricao().setComentarios(request.prescricao().comentarios());
+        rs.getPrescricao().setDataPrescricao(request.prescricao().dataPrescricao());
+
+        rs.getPrescricao().getMedicamentos().clear();
+
+        for (PrescricaoMedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
+            PrescricaoMedicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
+            medicamento.setPrescricao(rs.getPrescricao());
+            rs.getPrescricao().getMedicamentos().add(medicamento);
+        }
+
+        return mapper.toDTO(resultadoConsultaRepository.save(rs));
+    }
+
+    public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
 
         if(consulta.getResultadoConsulta() == null) {
@@ -138,6 +155,7 @@ public class ResultadoConsultaService {
 
         resultadoConsultaRepository.delete(consulta.getResultadoConsulta());
     }
+
 
     private Consulta obterConsultaPeloIdOuLancarExcecao(Long id) {
         return consultaRepository.findById(id)

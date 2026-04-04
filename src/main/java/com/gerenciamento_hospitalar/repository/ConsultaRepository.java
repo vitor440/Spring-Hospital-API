@@ -1,9 +1,6 @@
 package com.gerenciamento_hospitalar.repository;
 
-import com.gerenciamento_hospitalar.model.Consulta;
-import com.gerenciamento_hospitalar.model.Medico;
-import com.gerenciamento_hospitalar.model.Paciente;
-import com.gerenciamento_hospitalar.model.StatusConsulta;
+import com.gerenciamento_hospitalar.model.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -29,7 +26,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
         AND c.diaSemana = :diaSemana 
         AND c.hora BETWEEN :horaInicio AND :horaFim
     """)
-    boolean existeConsulta(Medico medico, int diaSemana, LocalTime horaInicio, LocalTime horaFim);
+    boolean existeConsulta(Medico medico, DiaSemana diaSemana, LocalTime horaInicio, LocalTime horaFim);
 
     @Modifying
     @Transactional

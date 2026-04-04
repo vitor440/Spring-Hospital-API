@@ -56,6 +56,6 @@ public class ConsultaValidator {
 
     private boolean medicoIndisponivel(Consulta consulta) {
         return turnoAtendimentoRepository
-                .verificaDisponibilidade(consulta.getMedico(), consulta.getDiaSemana(), consulta.getHora());
+                .verificaDisponibilidadeMedico(consulta.getMedico(), consulta.getDiaSemana(), consulta.getHora());
     }
  }

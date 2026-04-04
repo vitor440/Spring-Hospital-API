@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Pacientes", description = "gerenciamento de pacientes.")
 public interface PacienteControllerDocs {
 
 
@@ -30,6 +32,9 @@ public interface PacienteControllerDocs {
     })
     ResponseEntity<PacienteResponse> addPaciente(@RequestBody @Valid PacienteRequest request);
 
+
+
+
     @Operation(summary = "atualizar paciente", description = "atualizar dados do paciente.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
@@ -40,9 +45,15 @@ public interface PacienteControllerDocs {
             ),
             @ApiResponse(description = "cpf duplicado", responseCode = "409",
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
+            ),
+            @ApiResponse(description = "Paciente não encontrado", responseCode = "404",
+                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
             )
     })
     ResponseEntity<PacienteResponse> atualizarPaciente(@PathVariable("id") Long id, @RequestBody @Valid PacienteRequest request);
+
+
+
 
     @Operation(summary = "obter paciente", description = "obtém paciente pelo id.")
     @ApiResponses({
@@ -64,6 +75,9 @@ public interface PacienteControllerDocs {
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
     );
+
+
+
 
     @Operation(summary = "deletar paciente", description = "deleta um paciente pelo id.")
     @ApiResponses({

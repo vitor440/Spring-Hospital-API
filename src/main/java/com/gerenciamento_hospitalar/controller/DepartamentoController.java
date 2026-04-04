@@ -24,7 +24,6 @@ import java.net.URI;
 @RestController
 @RequestMapping("/departamentos")
 @RequiredArgsConstructor
-@Tag(name = "Departamentos", description = "gerenciamento de departamentos")
 public class DepartamentoController implements DepartamentoControllerDocs {
 
     private final DepartamentoService service;

@@ -37,7 +37,7 @@ public class Prescricao {
     @Column(name = "comentarios")
     private String comentarios;
 
-    @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PrescricaoMedicamento> medicamentos;
 
 }

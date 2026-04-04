@@ -2,6 +2,7 @@ package com.gerenciamento_hospitalar.validator;
 
 import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
 import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
+import com.gerenciamento_hospitalar.model.DiaSemana;
 import com.gerenciamento_hospitalar.model.TurnoAtendimento;
 import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
@@ -26,17 +27,17 @@ public class TurnoAtendimentoValidator {
 
     private boolean verificaSobreposicao(TurnoAtendimento turnoAtendimento) {
         Medico medico = turnoAtendimento.getMedico();
-        int diaSemana = turnoAtendimento.getDiaSemana();
+        DiaSemana diaSemana = turnoAtendimento.getDiaSemana();
         LocalTime horaInicio = turnoAtendimento.getHoraInicio();
         LocalTime horaFim = turnoAtendimento.getHoraFim();
 
         return turnoAtendimentoRepository
-                .verificaSobreposicao(medico, diaSemana, horaInicio, horaFim);
+                .verificaSobreposicaoDeTurnos(medico, diaSemana, horaInicio, horaFim);
     }
 
     public void validarDelecao(TurnoAtendimento turnoAtendimento) {
         Medico medico = turnoAtendimento.getMedico();
-        int diaSemana = turnoAtendimento.getDiaSemana();
+        DiaSemana diaSemana = turnoAtendimento.getDiaSemana();
         LocalTime horaInicio = turnoAtendimento.getHoraInicio();
         LocalTime horaFim = turnoAtendimento.getHoraFim();
 

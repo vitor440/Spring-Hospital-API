@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Médicos", description = "gerenciamento de médicos")
 public interface MedicoControllerDocs {
+
+
     @Operation(summary = "Adicionar médico", description = "Adiciona novo médico.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "201",
@@ -38,15 +42,15 @@ public interface MedicoControllerDocs {
     })
     ResponseEntity<MedicoResponse> addMedico(@RequestBody @Valid MedicoRequest request);
 
+
+
+
     @Operation(summary = "atualizar médico", description = "atualiza dados do médico.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
                     content = @Content(schema = @Schema(implementation = MedicoResponse.class))
             ),
             @ApiResponse(description = "departamento/médico não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-            @ApiResponse(description = "médico não encontrado", responseCode = "404",
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             ),
             @ApiResponse(description = "unprocessable entity", responseCode = "422",
@@ -57,6 +61,9 @@ public interface MedicoControllerDocs {
             )
     })
     ResponseEntity<MedicoResponse> atualizarMedico(@PathVariable("id") Long id, @RequestBody @Valid MedicoRequest request);
+
+
+
 
     @Operation(summary = "obter médico", description = "obtém médico pelo id.")
     @ApiResponses({
@@ -69,6 +76,9 @@ public interface MedicoControllerDocs {
     })
     ResponseEntity<MedicoResponse> obterMedicoPeloId(@PathVariable("id") Long id);
 
+
+
+
     @Operation(summary = "listar médicos", description = "pesquisa médicos pelo nome e especialidade.")
     ResponseEntity<Page<MedicoResponse>> listarMedicos(
             @RequestParam(value = "nome", required = false) String nome,
@@ -77,6 +87,9 @@ public interface MedicoControllerDocs {
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
     );
+
+
+
 
     @Operation(summary = "deletar médico", description = "deleta médico pelo id.")
     @ApiResponses({
@@ -92,6 +105,9 @@ public interface MedicoControllerDocs {
     })
     ResponseEntity<Void> deletarMedicoPeloId(@PathVariable("id") Long id);
 
+
+
+
     @Operation(summary = "adicionar turno de atendimento", description = "adiciona turno de atendimento para um médico.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "201",
@@ -106,6 +122,8 @@ public interface MedicoControllerDocs {
     })
     ResponseEntity<TurnoAtendimentoResponse> addTurnoMedico(@PathVariable("id") Long id,
                                                             @RequestBody TurnoAtendimentoRequest request);
+
+
 
     @Operation(summary = "atualizar turno de atendimento", description = "atualiza turno de atendimento de um médico.")
     @ApiResponses({
@@ -124,6 +142,9 @@ public interface MedicoControllerDocs {
                                                                   @PathVariable("turnoId") Long turnoId,
                                                                   @RequestBody TurnoAtendimentoRequest request);
 
+
+
+
     @Operation(summary = "listar turnos de atendimentos", description = "lista todas os turnos de atendimentos de um médico.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
@@ -138,6 +159,9 @@ public interface MedicoControllerDocs {
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho
     );
+
+
+
 
     @Operation(summary = "deletar turno de atendimento", description = "deleta turno de atendimento de um médico.")
     @ApiResponses({
@@ -154,6 +178,8 @@ public interface MedicoControllerDocs {
     })
     ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id,
                                                                       @PathVariable("turnoId") Long turnoId);
+
+
 
     @Operation(summary = "obter consultas", description = "lista todas as consultas de um médico.")
     @ApiResponses({

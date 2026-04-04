@@ -35,7 +35,8 @@ public class Consulta {
     private LocalTime hora;
 
     @Column(name = "dia_semana")
-    private Integer diaSemana;
+    @Enumerated(EnumType.STRING)
+    private DiaSemana diaSemana;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

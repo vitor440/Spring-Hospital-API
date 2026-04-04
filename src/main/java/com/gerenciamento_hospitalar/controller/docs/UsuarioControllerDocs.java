@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Usuario", description = "endpoint para cadastro de usuários, obtenção de tokens jwt e obtenção de novo token com refresh token")
 public interface UsuarioControllerDocs {
 
+
     @Operation(summary = "Obter token", description = "obtém um token através da autenticação com usuário e senha.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
@@ -41,6 +42,7 @@ public interface UsuarioControllerDocs {
     )
     ResponseEntity<?> refresh(@PathVariable("username") String username,
                               @RequestHeader("Authorization") String refreshToken);
+
 
 
 

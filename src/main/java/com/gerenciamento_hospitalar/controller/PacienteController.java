@@ -24,7 +24,6 @@ import java.net.URI;
 @RestController
 @RequestMapping("/pacientes")
 @RequiredArgsConstructor
-@Tag(name = "Pacientes", description = "gerenciamento de pacientes.")
 public class PacienteController implements PacienteControllerDocs {
 
     private final PacienteService service;

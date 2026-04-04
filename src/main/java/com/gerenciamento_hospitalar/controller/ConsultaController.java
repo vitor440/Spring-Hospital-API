@@ -1,21 +1,13 @@
 package com.gerenciamento_hospitalar.controller;
 
 import com.gerenciamento_hospitalar.controller.docs.ConsultaControllerDocs;
-import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.ConsultaRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
-import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.service.ConsultaService;
 import com.gerenciamento_hospitalar.service.ResultadoConsultaService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -79,8 +71,8 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PostMapping("/{id}/resultado")
     @Override
-    public ResponseEntity<ResultadoConsultaResponse> create(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
-        ResultadoConsultaResponse response = resultadoConsultaService.create(request, consultaId);
+    public ResponseEntity<ResultadoConsultaResponse> gerarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
+        ResultadoConsultaResponse response = resultadoConsultaService.gerarResultadoDaConsulta(request, consultaId);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -92,31 +84,46 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PutMapping("/{id}/resultado")
     @Override
-    public ResponseEntity<ResultadoConsultaResponse> update(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
+    public ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
 
-        return ResponseEntity.ok(resultadoConsultaService.update(consultaId, request));
+        return ResponseEntity.ok(resultadoConsultaService.atualizarResultadoDaConsulta2(consultaId, request));
     }
 
     @GetMapping("/{id}/resultado")
     @Override
     public ResponseEntity<ResultadoConsultaResponse> obterResultado(@PathVariable("id") Long consultaId) {
 
-        return ResponseEntity.ok(resultadoConsultaService.getByConsultaId(consultaId));
+        return ResponseEntity.ok(resultadoConsultaService.obterResultadoPeloIdDaConsulta(consultaId));
     }
 
     @DeleteMapping("/{id}/resultado")
     @Override
-    public ResponseEntity<ResultadoConsultaResponse> delete(@PathVariable("id") Long consultaId) {
+    public ResponseEntity<ResultadoConsultaResponse> deletarResultado(@PathVariable("id") Long consultaId) {
 
-        resultadoConsultaService.delete(consultaId);
+        resultadoConsultaService.deletarResultadoDaConsulta(consultaId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/{status}")
+    @PatchMapping("/{id}/status/realizar")
     @Override
-    public ResponseEntity<Void> modificaStatusConsulta(@PathVariable("id") Long id,
-                                                       @PathVariable("status") StatusConsulta status) {
-        service.modificaStatusConsulta(id, status);
+    public ResponseEntity<Void> AlterarStatusConsultaParaRealizada(@PathVariable("id") Long id) {
+        service.modificaStatusConsulta(id, StatusConsulta.REALIZADA);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/status/cancelar")
+    @Override
+    public ResponseEntity<Void> AlterarStatusConsultaParaCancelada(@PathVariable("id") Long id) {
+        service.modificaStatusConsulta(id, StatusConsulta.CANCELADA);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status/faltante")
+    @Override
+    public ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id) {
+        service.modificaStatusConsulta(id, StatusConsulta.FALTANTE);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

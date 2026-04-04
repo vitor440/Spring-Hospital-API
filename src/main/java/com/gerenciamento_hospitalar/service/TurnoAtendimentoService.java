@@ -53,7 +53,7 @@ public class TurnoAtendimentoService {
 
 
     public TurnoAtendimentoResponse atualizarDisponibilidadeMedico2(Long id, TurnoAtendimentoRequest request) {
-        TurnoAtendimento turnoAtendimento = obterPorIdOuLancarExcecao(id);
+        TurnoAtendimento turnoAtendimento = obterTurnoPorIdOuLancarExcecao(id);
 
         turnoAtendimento.setDiaSemana(request.diaSemana());
         turnoAtendimento.setHoraInicio(request.horaInicio());
@@ -95,7 +95,7 @@ public class TurnoAtendimentoService {
 
 
     public TurnoAtendimentoResponse obterPeloId(Long id) {
-        return mapper.toDTO(obterPorIdOuLancarExcecao(id));
+        return mapper.toDTO(obterTurnoPorIdOuLancarExcecao(id));
     }
 
     public Page<TurnoAtendimentoResponse> listarDisponibilidades2(int pagina, int tamanho) {
@@ -117,7 +117,7 @@ public class TurnoAtendimentoService {
 
 
     public void deletarPeloId(Long id) {
-        TurnoAtendimento turnoAtendimento = obterPorIdOuLancarExcecao(id);
+        TurnoAtendimento turnoAtendimento = obterTurnoPorIdOuLancarExcecao(id);
         validator.validarDelecao(turnoAtendimento);
         turnoAtendimentoRepository.delete(turnoAtendimento);
     }
@@ -143,7 +143,7 @@ public class TurnoAtendimentoService {
 
 
 
-    private TurnoAtendimento obterPorIdOuLancarExcecao(Long id) {
+    private TurnoAtendimento obterTurnoPorIdOuLancarExcecao(Long id) {
         return turnoAtendimentoRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe disponibilidade com esse ID!"));
     }

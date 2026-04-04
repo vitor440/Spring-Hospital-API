@@ -55,7 +55,7 @@ public class JwtProvider {
     public TokenDTO createRefreshToken(String refreshtoken) {
 
         String token = "";
-        if(StringUtils.isEmpty(refreshtoken) && refreshtoken.startsWith("Bearer ")) {
+        if(!StringUtils.isEmpty(refreshtoken) && refreshtoken.startsWith("Bearer ")) {
             token = refreshtoken.substring("Bearer ".length());
         }
 

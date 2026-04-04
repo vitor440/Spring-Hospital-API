@@ -8,12 +8,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Departamentos", description = "gerenciamento de departamentos")
 public interface DepartamentoControllerDocs {
+
 
     @Operation(summary = "adicionar departamento", description = "Adiciona novo departamento.")
     @ApiResponses({
@@ -28,6 +31,9 @@ public interface DepartamentoControllerDocs {
             )
     })
     ResponseEntity<DepartamentoResponse> addDepartamento(@RequestBody @Valid DepartamentoRequest request);
+
+
+
 
     @Operation(summary = "atualizar departamento", description = "atualiza departamento pelo id.")
     @ApiResponses({
@@ -47,6 +53,8 @@ public interface DepartamentoControllerDocs {
     ResponseEntity<DepartamentoResponse> atualizarDepartamento(@PathVariable("id") Long id,
                                                                @RequestBody @Valid DepartamentoRequest request);
 
+
+
     @Operation(summary = "obter departamento", description = "obtém departamento pelo id.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
@@ -58,6 +66,9 @@ public interface DepartamentoControllerDocs {
     })
     ResponseEntity<DepartamentoResponse> obterDepartamentoPeloId(@PathVariable("id") Long id);
 
+
+
+
     @Operation(summary = "listar departamento", description = "pesquisa departamento pelo nome e localização.")
     ResponseEntity<Page<DepartamentoResponse>> listarDepartamentos(
             @RequestParam(value = "nome", required = false) String nome,
@@ -66,6 +77,9 @@ public interface DepartamentoControllerDocs {
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
     );
+
+
+
 
     @Operation(summary = "deletar departamento", description = "deleta departamento pelo id.")
     @ApiResponses({
@@ -76,6 +90,7 @@ public interface DepartamentoControllerDocs {
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             ),
             @ApiResponse(description = "deleção não permitida: proibido excluir departamentos com médicos associados.",
+                    responseCode = "409",
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             )
     })

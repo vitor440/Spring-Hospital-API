@@ -30,7 +30,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/medicos")
 @RequiredArgsConstructor
-@Tag(name = "Médicos", description = "gerenciamento de médicos")
 public class MedicoController implements MedicoControllerDocs {
 
     private final MedicoService service;
