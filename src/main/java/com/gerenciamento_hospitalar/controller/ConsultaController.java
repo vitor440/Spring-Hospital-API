@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,6 +28,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PostMapping
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> agendarConsulta(@RequestBody @Valid ConsultaRequest request) {
         ConsultaResponse response = service.agendarConsulta(request);
 
@@ -40,18 +42,21 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PutMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> atualizarConsulta(@PathVariable("id") Long id, @RequestBody @Valid ConsultaRequest request) {
         return ResponseEntity.ok(service.atualizarConsulta(id, request));
     }
 
     @GetMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> obterConsultaPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultaPeloId(id));
     }
 
     @GetMapping
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Page<ConsultaResponse>> listarConsultas(
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho,
@@ -64,6 +69,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> deletarConsultaPeloId(@PathVariable("id") Long id) {
         service.deletarConsultaPeloId(id);
         return ResponseEntity.noContent().build();
@@ -71,6 +77,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PostMapping("/{id}/resultado")
     @Override
+    @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> gerarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
         ResultadoConsultaResponse response = resultadoConsultaService.gerarResultadoDaConsulta(request, consultaId);
 
@@ -84,21 +91,24 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PutMapping("/{id}/resultado")
     @Override
+    @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
 
-        return ResponseEntity.ok(resultadoConsultaService.atualizarResultadoDaConsulta2(consultaId, request));
+        return ResponseEntity.ok(resultadoConsultaService.atualizarResultadoDaConsulta(consultaId, request));
     }
 
     @GetMapping("/{id}/resultado")
     @Override
-    public ResponseEntity<ResultadoConsultaResponse> obterResultado(@PathVariable("id") Long consultaId) {
+    @PreAuthorize("hasAnyRole('MEDICO', 'RECEPCIONISTA')")
+    public ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long consultaId) {
 
         return ResponseEntity.ok(resultadoConsultaService.obterResultadoPeloIdDaConsulta(consultaId));
     }
 
     @DeleteMapping("/{id}/resultado")
     @Override
-    public ResponseEntity<ResultadoConsultaResponse> deletarResultado(@PathVariable("id") Long consultaId) {
+    @PreAuthorize("hasRole('MEDICO')")
+    public ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long consultaId) {
 
         resultadoConsultaService.deletarResultadoDaConsulta(consultaId);
         return ResponseEntity.noContent().build();
@@ -106,6 +116,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PatchMapping("/{id}/status/realizar")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaRealizada(@PathVariable("id") Long id) {
         service.modificaStatusConsulta(id, StatusConsulta.REALIZADA);
         return ResponseEntity.noContent().build();
@@ -113,6 +124,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PatchMapping("/{id}/status/cancelar")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaCancelada(@PathVariable("id") Long id) {
         service.modificaStatusConsulta(id, StatusConsulta.CANCELADA);
         return ResponseEntity.noContent().build();
@@ -120,6 +132,7 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @PatchMapping("/{id}/status/faltante")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id) {
         service.modificaStatusConsulta(id, StatusConsulta.FALTANTE);
         return ResponseEntity.noContent().build();

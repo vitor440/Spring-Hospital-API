@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "Pacientes", description = "gerenciamento de pacientes.")
 public interface PacienteControllerDocs {
@@ -92,4 +95,6 @@ public interface PacienteControllerDocs {
             ),
     })
     ResponseEntity<Void> deletarPacientePeloId(@PathVariable("id") Long id);
+
+    public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file);
 }

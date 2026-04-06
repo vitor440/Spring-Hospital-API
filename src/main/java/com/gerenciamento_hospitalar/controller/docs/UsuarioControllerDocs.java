@@ -2,7 +2,9 @@ package com.gerenciamento_hospitalar.controller.docs;
 
 import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.security.CadastroUsuarioDTO;
+import com.gerenciamento_hospitalar.dto.security.RoleDTO;
 import com.gerenciamento_hospitalar.dto.security.TokenDTO;
+import com.gerenciamento_hospitalar.model.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -60,4 +62,8 @@ public interface UsuarioControllerDocs {
     }
     )
     ResponseEntity<CadastroUsuarioDTO> createUser(@RequestBody CadastroUsuarioDTO usuarioDTO);
+
+    ResponseEntity<Void> adicionaRole(@PathVariable("userId") Long userId, @RequestBody RoleDTO roleDTO);
+
+    ResponseEntity<Role> criaRole(@RequestBody Role role);
 }

@@ -2,8 +2,12 @@ package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
+import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
+import com.gerenciamento_hospitalar.file.imports.contract.DepartamentoImporter;
+import com.gerenciamento_hospitalar.file.imports.contract.MedicoImporter;
+import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
 import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
 import com.gerenciamento_hospitalar.mapper.MedicoMapper;
 import com.gerenciamento_hospitalar.model.Consulta;
@@ -17,7 +21,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +36,7 @@ public class MedicoService {
     private final MedicoMapper mapper;
     private final ConsultaMapper consultaMapper;
     private final DepartamentoRepository departamentoRepository;
+    private final MedicoImporterFactory factory;
 
     public MedicoResponse addMedico(MedicoRequest request) {
         Medico medico = mapper.toEntity(request);
@@ -95,7 +102,33 @@ public class MedicoService {
 
         List<Consulta> consultas = medico.getConsultas();
 
+        if(consultas == null || consultas.isEmpty()) return List.of();
+
         return consultas.stream().map(consultaMapper::toDTO).toList();
+    }
+
+
+    public List<MedicoResponse> importar(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+
+        if(filename.isBlank() || filename == null) {
+            throw new RuntimeException("Nome do arquivo .csv inválido.");
+        }
+
+        MedicoImporter importer = factory.getImporter(filename);
+
+        try {
+            List<Medico> medicos = importer.importFile(file.getInputStream());
+
+            List<MedicoResponse> medicoResponses = medicoRepository.saveAll(medicos).stream()
+                    .map(mapper::toDTO)
+                    .toList();
+
+            return medicoResponses;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao importar arquivo .csv");
+        }
     }
 
     private Medico obterMedicoPeloIdOuLancarExcecao(Long id) {

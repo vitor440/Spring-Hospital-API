@@ -3,6 +3,7 @@ package com.gerenciamento_hospitalar.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -43,23 +44,31 @@ public class Usuario implements UserDetails {
     @JoinTable(name = "user_roles",
     joinColumns = {@JoinColumn(name = "usuario_id")},
     inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private List<Roles> permissions;
+    private List<Role> permissions;
 
 
 
     public List<String> getRoles() {
         List<String> roles = new ArrayList<>();
-        for (Roles permission : this.permissions) {
+        for (Role permission : this.permissions) {
             roles.add(permission.getRole());
         }
 
         return roles;
     }
 
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.permissions;
+//    }
+//
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.permissions;
+        return this.permissions.stream()
+                .map(permission -> new SimpleGrantedAuthority("ROLE_" + permission.getRole()))
+                .toList();
     }
+
 
     @Override
     public String getPassword() {

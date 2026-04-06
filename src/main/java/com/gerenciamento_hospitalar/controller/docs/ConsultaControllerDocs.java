@@ -97,7 +97,7 @@ public interface ConsultaControllerDocs {
 
 
 
-    @Operation(summary = "adicionar resultado para uma consulta", description = "cria um resultado para uma consulta.")
+    @Operation(summary = "adicionar resultado consulta", description = "cria um resultado para uma consulta.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "201",
                     content = @Content(schema = @Schema(implementation = ResultadoConsultaResponse.class))
@@ -111,7 +111,7 @@ public interface ConsultaControllerDocs {
 
 
 
-    @Operation(summary = "adicionar resultado para uma consulta", description = "cria um resultado para uma consulta.")
+    @Operation(summary = "obter resultado de uma consulta", description = "obtém o resultado de uma consulta pelo id da consulta.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "201",
                     content = @Content(schema = @Schema(implementation = ResultadoConsultaResponse.class))
@@ -120,7 +120,7 @@ public interface ConsultaControllerDocs {
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             )
     })
-    ResponseEntity<ResultadoConsultaResponse> obterResultado(@PathVariable("id") Long consultaId);
+    ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long consultaId);
 
 
 
@@ -148,7 +148,7 @@ public interface ConsultaControllerDocs {
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             )
     })
-    ResponseEntity<ResultadoConsultaResponse> deletarResultado(@PathVariable("id") Long consultaId);
+    ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long consultaId);
 
 
 

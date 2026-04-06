@@ -1,5 +1,6 @@
 package com.gerenciamento_hospitalar.dto.response;
 
+import com.gerenciamento_hospitalar.model.DiaSemana;
 import com.gerenciamento_hospitalar.model.StatusConsulta;
 
 import java.time.LocalDate;
@@ -11,6 +12,6 @@ public record ConsultaResponse(Long id,
                                String proposito,
                                LocalDate data,
                                LocalTime hora,
-                               Integer diaSemana,
+                               DiaSemana diaSemana,
                                StatusConsulta status) {
 }

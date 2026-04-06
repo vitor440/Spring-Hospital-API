@@ -21,7 +21,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -37,6 +39,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @PostMapping
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MedicoResponse> addMedico(@RequestBody @Valid MedicoRequest request) {
         MedicoResponse response = service.addMedico(request);
 
@@ -50,6 +53,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @PutMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MedicoResponse> atualizarMedico(@PathVariable("id") Long id, @RequestBody @Valid MedicoRequest request) {
 
         return ResponseEntity.ok(service.atualizarMedico(id, request));
@@ -57,6 +61,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @GetMapping("/{id}")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<MedicoResponse> obterMedicoPeloId(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(service.obterMedicoPeloId(id));
@@ -64,6 +69,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @GetMapping
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<MedicoResponse>> listarMedicos(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "especialidade", required = false) Especialidade especialidade,
@@ -77,6 +83,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletarMedicoPeloId(@PathVariable("id") Long id) {
 
         service.deletarMedicoPeloId(id);
@@ -85,6 +92,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @PostMapping("/{id}/turnos-atendimento")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<TurnoAtendimentoResponse> addTurnoMedico(@PathVariable("id") Long id,
                                                                    @RequestBody TurnoAtendimentoRequest request) {
         TurnoAtendimentoResponse response = turnoAtendimentoService.addDisponibilidadeMedico(id, request);
@@ -98,6 +106,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @PutMapping("/{id}/turnos-atendimento/{turnoId}")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<TurnoAtendimentoResponse> atualizarTurnoMedico(@PathVariable("id") Long id,
                                                                          @PathVariable("turnoId") Long turnoId,
                                                                          @RequestBody TurnoAtendimentoRequest request) {
@@ -106,6 +115,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @GetMapping("/{id}/turnos-atendimento")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<List<TurnoAtendimentoResponse>> listarTurnos(
             @PathVariable("id") Long id,
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
@@ -117,6 +127,7 @@ public class MedicoController implements MedicoControllerDocs {
 
     @DeleteMapping("/{id}/turnos-atendimento/{turnoId}")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id,
                                                                              @PathVariable("turnoId") Long turnoId) {
         turnoAtendimentoService.deletarPeloIdMedico(id, turnoId);
@@ -126,7 +137,13 @@ public class MedicoController implements MedicoControllerDocs {
 
     @GetMapping("/{id}/consultas")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
     public ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultas(id));
+    }
+
+    @PostMapping("/importar")
+    public ResponseEntity<List<MedicoResponse>> importarDados(@RequestParam("file")MultipartFile file) {
+        return ResponseEntity.ok(service.importar(file));
     }
 }

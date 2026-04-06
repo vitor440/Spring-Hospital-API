@@ -8,5 +8,5 @@ public record MedicoResponse(Long id,
                              String email,
                              String telefone,
                              Especialidade especialidade,
-                             DepartamentoResponse departamento) {
+                             Long departamentoId) {
 }

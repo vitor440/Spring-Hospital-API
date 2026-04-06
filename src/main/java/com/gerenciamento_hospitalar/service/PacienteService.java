@@ -3,6 +3,8 @@ package com.gerenciamento_hospitalar.service;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
+import com.gerenciamento_hospitalar.file.imports.contract.PacienteImporter;
+import com.gerenciamento_hospitalar.file.imports.factory.PacienteImporterFactory;
 import com.gerenciamento_hospitalar.mapper.PacienteMapper;
 import com.gerenciamento_hospitalar.model.Paciente;
 import com.gerenciamento_hospitalar.repository.PacienteRepository;
@@ -15,6 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +29,7 @@ public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final PacienteValidator validator;
+    private final PacienteImporterFactory factory;
     private final PacienteMapper mapper;
 
     public PacienteResponse addPaciente(PacienteRequest request) {
@@ -78,6 +86,30 @@ public class PacienteService {
         Pageable pageable = PageRequest.of(pagina, tamanho, sort, "nome");
 
         return pacienteRepository.findAll(specs, pageable).map(mapper::toDTO);
+    }
+
+
+    public List<PacienteResponse> importar(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+
+        if(filename.isBlank() || filename == null) {
+            throw new RuntimeException("Nome do arquivo .csv inválido.");
+        }
+
+        PacienteImporter importer = factory.getImporter(filename);
+
+        try {
+            List<Paciente> pacientes = importer.importFile(file.getInputStream());
+
+            List<PacienteResponse> pacienteResponses = pacienteRepository.saveAll(pacientes).stream()
+                    .map(mapper::toDTO)
+                    .toList();
+
+            return pacienteResponses;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao importar arquivo .csv");
+        }
     }
 
     private Paciente obterPacientePeloIdOuLancarExcecao(Long id) {

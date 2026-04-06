@@ -16,10 +16,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -55,6 +59,7 @@ public class PacienteController implements PacienteControllerDocs {
 
     @GetMapping
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PacienteResponse>> listarPacientes(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "genero", required = false) String genero,
@@ -72,5 +77,10 @@ public class PacienteController implements PacienteControllerDocs {
         service.deletarPaciente(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/importar")
+    public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(service.importar(file));
     }
 }

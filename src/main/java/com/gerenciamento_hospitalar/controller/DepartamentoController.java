@@ -17,9 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/departamentos")
@@ -72,5 +74,8 @@ public class DepartamentoController implements DepartamentoControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PostMapping("/importar")
+    public ResponseEntity<List<DepartamentoResponse>> importarDados(@RequestParam("file")MultipartFile file) {
+        return ResponseEntity.ok(service.importar(file));
+    }
 }

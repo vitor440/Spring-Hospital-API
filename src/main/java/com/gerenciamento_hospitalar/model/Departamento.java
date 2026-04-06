@@ -1,6 +1,7 @@
 package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,6 +15,7 @@ import java.util.List;
 @Table(name = "departamento")
 @Data
 @ToString(exclude = "medicos")
+
 @EntityListeners(AuditingEntityListener.class)
 public class Departamento {
 
@@ -33,4 +35,15 @@ public class Departamento {
 
     @OneToMany(mappedBy = "departamento", fetch = FetchType.LAZY)
     private List<Medico> medicos;
+
+    public Departamento(Long id, String nome, String localizacao, LocalDateTime dataCriacao) {
+        this.id = id;
+        this.nome = nome;
+        this.localizacao = localizacao;
+        this.dataCriacao = dataCriacao;
+    }
+
+    public Departamento() {
+
+    }
 }

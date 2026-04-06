@@ -12,7 +12,5 @@ public record TurnoAtendimentoRequest(@NotNull(message = "campo obrigatório!")
                                       @NotNull(message = "campo obrigatório!")
                                            LocalTime horaInicio,
                                       @NotNull(message = "campo obrigatório!")
-                                           LocalTime horaFim,
-                                      @NotNull(message = "campo obrigatório!")
-                                           Long medicoId) {
+                                           LocalTime horaFim) {
 }

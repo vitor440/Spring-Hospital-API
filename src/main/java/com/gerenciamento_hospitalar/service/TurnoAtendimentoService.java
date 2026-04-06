@@ -28,16 +28,6 @@ public class TurnoAtendimentoService {
     private final MedicoRepository medicoRepository;
     private final TurnoAtendimentoMapper mapper;
 
-    public TurnoAtendimentoResponse addDisponibilidadeMedico2(TurnoAtendimentoRequest request) {
-        TurnoAtendimento turnoAtendimento = mapper.toEntity(request);
-
-        Medico medico = obterMedicoPorIdOuLancarExcecao(request.medicoId());
-
-        turnoAtendimento.setMedico(medico);
-
-        validator.validar(turnoAtendimento);
-        return mapper.toDTO(turnoAtendimentoRepository.save(turnoAtendimento));
-    }
 
     public TurnoAtendimentoResponse addDisponibilidadeMedico(Long id, TurnoAtendimentoRequest request) {
         TurnoAtendimento turnoAtendimento = mapper.toEntity(request);
@@ -50,22 +40,6 @@ public class TurnoAtendimentoService {
         return mapper.toDTO(turnoAtendimentoRepository.save(turnoAtendimento));
     }
 
-
-
-    public TurnoAtendimentoResponse atualizarDisponibilidadeMedico2(Long id, TurnoAtendimentoRequest request) {
-        TurnoAtendimento turnoAtendimento = obterTurnoPorIdOuLancarExcecao(id);
-
-        turnoAtendimento.setDiaSemana(request.diaSemana());
-        turnoAtendimento.setHoraInicio(request.horaInicio());
-        turnoAtendimento.setHoraFim(request.horaFim());
-
-        Medico medico = obterMedicoPorIdOuLancarExcecao(request.medicoId());
-
-        turnoAtendimento.setMedico(medico);
-
-        validator.validar(turnoAtendimento);
-        return mapper.toDTO(turnoAtendimentoRepository.save(turnoAtendimento));
-    }
 
     @Transactional
     public TurnoAtendimentoResponse atualizarDisponibilidadeMedico(Long medicoId,
