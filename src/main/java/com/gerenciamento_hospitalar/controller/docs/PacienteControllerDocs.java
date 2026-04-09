@@ -2,6 +2,7 @@ package com.gerenciamento_hospitalar.controller.docs;
 
 import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
+import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -95,6 +96,10 @@ public interface PacienteControllerDocs {
             ),
     })
     ResponseEntity<Void> deletarPacientePeloId(@PathVariable("id") Long id);
+
+    ResponseEntity<List<ConsultaResponse>> historicoConsultas(@PathVariable("id") Long id);
+
+    ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadas(@PathVariable("id") Long id);
 
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file);
 }

@@ -1,0 +1,1 @@
+ALTER TABLE disponibilidade_medico RENAME TO turno_atendimento_medico;

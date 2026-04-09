@@ -3,6 +3,7 @@ package com.gerenciamento_hospitalar.controller;
 import com.gerenciamento_hospitalar.controller.docs.PacienteControllerDocs;
 import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
+import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
 import com.gerenciamento_hospitalar.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ public class PacienteController implements PacienteControllerDocs {
 
     @PostMapping
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<PacienteResponse> addPaciente(@RequestBody @Valid PacienteRequest request) {
         PacienteResponse response = service.addPaciente(request);
 
@@ -47,19 +49,21 @@ public class PacienteController implements PacienteControllerDocs {
 
     @PutMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<PacienteResponse> atualizarPaciente(@PathVariable("id") Long id, @RequestBody @Valid PacienteRequest request) {
         return ResponseEntity.ok(service.atualizarPaciente(id, request));
     }
 
     @GetMapping("/{id}")
     @Override
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'PACIENTE')")
     public ResponseEntity<PacienteResponse> obterPacientePeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterPacientePeloId(id));
     }
 
     @GetMapping
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Page<PacienteResponse>> listarPacientes(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "genero", required = false) String genero,
@@ -73,13 +77,30 @@ public class PacienteController implements PacienteControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> deletarPacientePeloId(@PathVariable("id") Long id) {
         service.deletarPaciente(id);
 
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/consultas")
+    @Override
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'PACIENTE')")
+    public ResponseEntity<List<ConsultaResponse>> historicoConsultas(Long id) {
+        return ResponseEntity.ok(service.historicoConsultas(id));
+    }
+
+    @GetMapping("/{id}/consultasAgendadas")
+    @Override
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'PACIENTE')")
+    public ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadas(Long id) {
+        return ResponseEntity.ok(service.listarConsultasAgendadas(id));
+    }
+
+
     @PostMapping("/importar")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(service.importar(file));
     }

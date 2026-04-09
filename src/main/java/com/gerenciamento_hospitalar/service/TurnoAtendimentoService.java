@@ -6,6 +6,7 @@ import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.TurnoAtendimentoMapper;
 import com.gerenciamento_hospitalar.model.TurnoAtendimento;
 import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.model.Usuario;
 import com.gerenciamento_hospitalar.repository.TurnoAtendimentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import com.gerenciamento_hospitalar.validator.TurnoAtendimentoValidator;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,7 +85,13 @@ public class TurnoAtendimentoService {
         Pageable pageable = PageRequest.of(pagina, tamanho);
 
         Medico medico = obterMedicoPorIdOuLancarExcecao(id);
+        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(user.getRoles().contains("MEDICO") && !user.getId().equals(medico.getUsuario())) throw new RuntimeException("Acesso negado!");
+
         List<TurnoAtendimento> disponibilidades = medico.getDisponibilidades();
+
+        if(disponibilidades == null || disponibilidades.isEmpty()) return List.of();
 
         return disponibilidades.stream().map(mapper::toDTO).toList();
     }

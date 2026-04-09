@@ -1,0 +1,1 @@
+ALTER TABLE resultado_consulta ALTER COLUMN prescricao_id DROP NOT NULL;

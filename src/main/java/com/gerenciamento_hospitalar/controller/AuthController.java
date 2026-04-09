@@ -51,7 +51,7 @@ public class AuthController implements UsuarioControllerDocs {
 
     @Override
     @PostMapping("/{userId}/roles")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> adicionaRole(@PathVariable("userId") Long userId, @RequestBody RoleDTO roleDTO) {
         authenticationService.adicionaRole(userId, roleDTO);
         return ResponseEntity.noContent().build();
@@ -59,7 +59,7 @@ public class AuthController implements UsuarioControllerDocs {
 
     @Override
     @PostMapping("/createRoles")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Role> criaRole(@RequestBody Role role) {
         return ResponseEntity.ok(roleService.createRole(role));
     }

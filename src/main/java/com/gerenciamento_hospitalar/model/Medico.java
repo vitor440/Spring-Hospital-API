@@ -36,6 +36,10 @@ public class Medico {
     @JoinColumn(name = "departamento_id")
     private Departamento departamento;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private Usuario usuario;
+
     @OneToMany(mappedBy = "medico")
     private List<Consulta> consultas;
 

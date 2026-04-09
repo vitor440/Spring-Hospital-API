@@ -25,5 +25,6 @@ public record PacienteRequest(@CPF(message = "cpf inválido!")
                               String tipoSanguineo,
                               @NotNull(message = "campo obrigatório!")
                               @Past(message = "data de nascimento não pode ser futura!")
-                              LocalDate dataNascimento) {
+                              LocalDate dataNascimento,
+                              Long userId) {
 }

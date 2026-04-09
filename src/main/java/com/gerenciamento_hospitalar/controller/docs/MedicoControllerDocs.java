@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -191,4 +192,8 @@ public interface MedicoControllerDocs {
             )
     })
     ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id);
+
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadas(@PathVariable("id") Long id);
+
+    public ResponseEntity<List<MedicoResponse>> importarDados(@RequestParam("file") MultipartFile file);
 }

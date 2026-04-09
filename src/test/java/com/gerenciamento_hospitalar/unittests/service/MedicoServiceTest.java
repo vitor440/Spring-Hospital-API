@@ -13,7 +13,9 @@ import com.gerenciamento_hospitalar.model.Especialidade;
 import com.gerenciamento_hospitalar.model.Medico;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
+import com.gerenciamento_hospitalar.repository.UsuarioRepository;
 import com.gerenciamento_hospitalar.service.MedicoService;
+import com.gerenciamento_hospitalar.service.SecurityService;
 import com.gerenciamento_hospitalar.validator.MedicoValidator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,12 @@ class MedicoServiceTest {
 
     @Mock
     DepartamentoRepository departamentoRepository;
+
+    @Mock
+    private SecurityService securityService;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
 
     @InjectMocks
     MedicoService service;
@@ -314,7 +322,7 @@ class MedicoServiceTest {
         String email = "robson@email.com";
         String telefone = "9999-9999";
 
-        MedicoRequest request = new MedicoRequest(crm, nome, email, telefone, neurologista, 1L);
+        MedicoRequest request = new MedicoRequest(crm, nome, email, telefone, neurologista, 1L, 1L);
         return request;
     }
 

@@ -2,7 +2,6 @@ package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
@@ -41,6 +40,10 @@ public class Paciente {
 
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
     private List<Consulta> consultas;

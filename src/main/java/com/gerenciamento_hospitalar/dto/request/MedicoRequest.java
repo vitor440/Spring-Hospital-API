@@ -16,5 +16,6 @@ public record MedicoRequest(
         @NotNull(message = "campo obrigatório!")
         Especialidade especialidade,
         @NotNull(message = "campo obrigatório!")
-        Long departamentoId) {
+        Long departamentoId,
+        Long userId) {
 }

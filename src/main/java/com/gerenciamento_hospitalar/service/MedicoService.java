@@ -2,20 +2,17 @@ package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
-import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
-import com.gerenciamento_hospitalar.file.imports.contract.DepartamentoImporter;
 import com.gerenciamento_hospitalar.file.imports.contract.MedicoImporter;
 import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
 import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
 import com.gerenciamento_hospitalar.mapper.MedicoMapper;
-import com.gerenciamento_hospitalar.model.Consulta;
-import com.gerenciamento_hospitalar.model.Departamento;
-import com.gerenciamento_hospitalar.model.Especialidade;
-import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.model.*;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
+import com.gerenciamento_hospitalar.repository.RoleRepository;
+import com.gerenciamento_hospitalar.repository.UsuarioRepository;
 import com.gerenciamento_hospitalar.validator.MedicoValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,13 +35,19 @@ public class MedicoService {
     private final ConsultaMapper consultaMapper;
     private final DepartamentoRepository departamentoRepository;
     private final MedicoImporterFactory factory;
+    private final SecurityService securityService;
+    private final UsuarioRepository usuarioRepository;
 
+
+    @Transactional
     public MedicoResponse addMedico(MedicoRequest request) {
         Medico medico = mapper.toEntity(request);
 
         Departamento departamento = obterDepartamentoPeloIdOuLancarExcecao(request.departamentoId());
+        Usuario usuario = getObterUsuarioPeloIdOuLancarExcecao(request.userId());
 
         medico.setDepartamento(departamento);
+        medico.setUsuario(usuario);
 
         validator.validar(medico);
         return mapper.toDTO(medicoRepository.save(medico));
@@ -67,7 +71,10 @@ public class MedicoService {
     }
 
     public MedicoResponse obterMedicoPeloId(Long id) {
-        return mapper.toDTO(obterMedicoPeloIdOuLancarExcecao(id));
+        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
+        securityService.validaUsuarioMedico(medico);
+
+        return mapper.toDTO(medico);
     }
 
     public void deletarMedicoPeloId(Long id) {
@@ -99,6 +106,7 @@ public class MedicoService {
     @Transactional
     public List<ConsultaResponse> obterConsultas(Long id) {
         Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
+        securityService.validaUsuarioMedico(medico);
 
         List<Consulta> consultas = medico.getConsultas();
 
@@ -106,6 +114,22 @@ public class MedicoService {
 
         return consultas.stream().map(consultaMapper::toDTO).toList();
     }
+
+    @Transactional
+    public List<ConsultaResponse> obterConsultasAgendadas(Long id) {
+        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
+        securityService.validaUsuarioMedico(medico);
+
+        List<Consulta> consultas = medico.getConsultas().stream()
+                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
+                .toList();
+
+        if(consultas == null || consultas.isEmpty()) return List.of();
+
+        return consultas.stream().map(consultaMapper::toDTO).toList();
+    }
+
+
 
 
     public List<MedicoResponse> importar(MultipartFile file) {
@@ -139,5 +163,10 @@ public class MedicoService {
     private Departamento obterDepartamentoPeloIdOuLancarExcecao(Long id) {
         return departamentoRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe departamento com esse ID!"));
+    }
+
+    private Usuario getObterUsuarioPeloIdOuLancarExcecao(Long userId) {
+        return usuarioRepository.findById(userId)
+                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe usuario com esse ID!"));
     }
 }
