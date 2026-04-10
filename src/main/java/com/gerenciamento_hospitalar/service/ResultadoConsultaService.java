@@ -84,6 +84,32 @@ public class ResultadoConsultaService {
         return mapper.toDTO(resultadoConsultaRepository.save(rs));
     }
 
+    public ResultadoConsultaResponse atualizarResultadoDaConsulta2(Long id, ResultadoConsultaRequest request) {
+        ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
+
+        rs.setSintomas(request.sintomas());
+        rs.setNotas(request.notas());
+        rs.setTratamento(request.tratamento());
+        rs.setDataRetorno(request.dataRetorno());
+        rs.setDiagnostico(request.diagnostico());
+
+        if(rs.getPrescricao() != null) {
+            rs.getPrescricao().setComentarios(request.prescricao().comentarios());
+            rs.getPrescricao().setDataPrescricao(request.prescricao().dataPrescricao());
+
+            rs.getPrescricao().getMedicamentos().clear();
+
+            for (MedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
+                Medicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
+                medicamento.setPrescricao(rs.getPrescricao());
+                rs.getPrescricao().getMedicamentos().add(medicamento);
+            }
+        }
+        return mapper.toDTO(resultadoConsultaRepository.save(rs));
+    }
+
+
+
     public void deletarResultadoDaConsulta(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
 
@@ -98,6 +124,14 @@ public class ResultadoConsultaService {
         resultadoConsultaRepository.delete(resultadoConsulta);
     }
 
+    public void deletarResultadoDaConsulta2(Long id) {
+        ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
+
+        resultadoConsultaRepository.delete(rs);
+    }
+
+
+
 
     public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta(Long consultaId) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
@@ -108,6 +142,12 @@ public class ResultadoConsultaService {
 
         return mapper.toDTO(consulta.getResultadoConsulta());
     }
+
+    public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta2(Long id) {
+        ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
+        return mapper.toDTO(rs);
+    }
+
 
 
     private Consulta obterConsultaPeloIdOuLancarExcecao(Long id) {

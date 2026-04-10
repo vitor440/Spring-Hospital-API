@@ -3,6 +3,7 @@ package com.gerenciamento_hospitalar.service;
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
+import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.file.imports.contract.MedicoImporter;
 import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
@@ -77,6 +78,21 @@ public class MedicoService {
         return mapper.toDTO(medico);
     }
 
+    public MedicoResponse obterMedicoLogado() {
+        Usuario usuarioLogado = securityService.getUsuarioLogado();
+        if(!usuarioLogado.getRoles().contains("MEDICO")) {
+            throw new AcessoNegadoException("acesso negado.");
+        }
+
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
+        if(medicoOpt.isPresent()) {
+            Medico medico = medicoOpt.get();
+            return mapper.toDTO(medico);
+        }
+
+        throw new AcessoNegadoException("acesso negado.");
+    }
+
     public void deletarMedicoPeloId(Long id) {
 
        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
@@ -116,6 +132,23 @@ public class MedicoService {
     }
 
     @Transactional
+    public List<ConsultaResponse> obterConsultasDoMedicoLogado() {
+        Usuario usuarioLogado = securityService.getUsuarioLogado();
+        if(!usuarioLogado.getRoles().contains("MEDICO")) {
+            throw new AcessoNegadoException("acesso negado.");
+        }
+
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
+        if(medicoOpt.isPresent()) {
+            Medico medico = medicoOpt.get();
+            List<Consulta> consultas = medico.getConsultas();
+            return consultas.stream().map(consultaMapper::toDTO).toList();
+        }
+
+        throw new AcessoNegadoException("acesso negado.");
+    }
+
+    @Transactional
     public List<ConsultaResponse> obterConsultasAgendadas(Long id) {
         Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
         securityService.validaUsuarioMedico(medico);
@@ -129,7 +162,24 @@ public class MedicoService {
         return consultas.stream().map(consultaMapper::toDTO).toList();
     }
 
+    @Transactional
+    public List<ConsultaResponse> obterConsultasAgendadasDoMedicoLogado() {
+        Usuario usuarioLogado = securityService.getUsuarioLogado();
+        if(!usuarioLogado.getRoles().contains("MEDICO")) {
+            throw new AcessoNegadoException("acesso negado.");
+        }
 
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
+        if(medicoOpt.isPresent()) {
+            Medico medico = medicoOpt.get();
+            List<Consulta> consultas = medico.getConsultas().stream()
+                    .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
+                    .toList();;
+            return consultas.stream().map(consultaMapper::toDTO).toList();
+        }
+
+        throw new AcessoNegadoException("acesso negado.");
+    }
 
 
     public List<MedicoResponse> importar(MultipartFile file) {

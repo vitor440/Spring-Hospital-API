@@ -24,7 +24,6 @@ import java.net.URI;
 public class ConsultaController implements ConsultaControllerDocs {
 
     private final ConsultaService service;
-    private final ResultadoConsultaService resultadoConsultaService;
 
     @PostMapping
     @Override
@@ -75,44 +74,6 @@ public class ConsultaController implements ConsultaControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/resultado")
-    @Override
-    @PreAuthorize("hasRole('MEDICO')")
-    public ResponseEntity<ResultadoConsultaResponse> gerarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
-        ResultadoConsultaResponse response = resultadoConsultaService.gerarResultadoDaConsulta(request, consultaId);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @PutMapping("/{id}/resultado")
-    @Override
-    @PreAuthorize("hasRole('MEDICO')")
-    public ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
-
-        return ResponseEntity.ok(resultadoConsultaService.atualizarResultadoDaConsulta(consultaId, request));
-    }
-
-    @GetMapping("/{id}/resultado")
-    @Override
-    @PreAuthorize("hasAnyRole('MEDICO', 'RECEPCIONISTA')")
-    public ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long consultaId) {
-
-        return ResponseEntity.ok(resultadoConsultaService.obterResultadoPeloIdDaConsulta(consultaId));
-    }
-
-    @DeleteMapping("/{id}/resultado")
-    @Override
-    @PreAuthorize("hasRole('MEDICO')")
-    public ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long consultaId) {
-
-        resultadoConsultaService.deletarResultadoDaConsulta(consultaId);
-        return ResponseEntity.noContent().build();
-    }
 
     @PatchMapping("/{id}/status/realizar")
     @Override

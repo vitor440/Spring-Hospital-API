@@ -3,6 +3,7 @@ package com.gerenciamento_hospitalar.service;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
+import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.file.imports.contract.PacienteImporter;
 import com.gerenciamento_hospitalar.file.imports.factory.PacienteImporterFactory;
@@ -72,9 +73,26 @@ public class PacienteService {
 
     public PacienteResponse obterPacientePeloId(Long id) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioPaciente(paciente);
         return mapper.toDTO(paciente);
     }
+
+    public PacienteResponse obterPacienteLogado() {
+        Usuario usuario = securityService.getUsuarioLogado();
+        if(!usuario.getRoles().contains("PACIENTE")) {
+            throw new AcessoNegadoException("acesso negado");
+        }
+
+        Optional<Paciente> pacienteOpt = pacienteRepository.findByUsuario(usuario);
+
+        if(pacienteOpt.isPresent()) {
+            Paciente paciente = pacienteOpt.get();
+            return mapper.toDTO(paciente);
+        }
+        throw new AcessoNegadoException("acesso negado");
+
+    }
+
+
 
     public void deletarPaciente(Long id) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
@@ -108,7 +126,7 @@ public class PacienteService {
     @Transactional
     public List<ConsultaResponse> historicoConsultas(Long id) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioPaciente(paciente);
+
 
         List<Consulta> consultas = paciente.getConsultas();
 
@@ -121,7 +139,6 @@ public class PacienteService {
     @Transactional
     public List<ConsultaResponse> listarConsultasAgendadas(Long id) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioPaciente(paciente);
 
         List<Consulta> consultas = paciente.getConsultas().stream()
                 .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
@@ -131,6 +148,55 @@ public class PacienteService {
 
         return consultas.stream().map(consultaMapper::toDTO)
                 .toList();
+    }
+
+    @Transactional
+    public List<ConsultaResponse> historicoConsultasPacienteLogado() {
+        Usuario usuario = securityService.getUsuarioLogado();
+
+        if(!usuario.getRoles().contains("PACIENTE")) {
+            throw new AcessoNegadoException("acesso negado");
+        }
+
+        Optional<Paciente> pacienteOpt = pacienteRepository.findByUsuario(usuario);
+
+        if(pacienteOpt.isPresent()) {
+            Paciente paciente = pacienteOpt.get();
+
+            List<Consulta> consultas = paciente.getConsultas();
+
+            if(consultas == null || consultas.isEmpty()) return List.of();
+
+            return consultas.stream().map(consultaMapper::toDTO)
+                    .toList();
+        }
+        throw new AcessoNegadoException("acesso negado");
+    }
+
+
+    @Transactional
+    public List<ConsultaResponse> listarConsultasAgendadasDoPacienteLogado() {
+        Usuario usuario = securityService.getUsuarioLogado();
+
+        if(!usuario.getRoles().contains("PACIENTE")) {
+            throw new AcessoNegadoException("acesso negado");
+        }
+
+        Optional<Paciente> pacienteOpt = pacienteRepository.findByUsuario(usuario);
+
+        if(pacienteOpt.isPresent()) {
+            Paciente paciente = pacienteOpt.get();
+
+            List<Consulta> consultas = paciente.getConsultas().stream()
+                    .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
+                    .toList();
+
+            if(consultas == null || consultas.isEmpty()) return List.of();
+
+            return consultas.stream().map(consultaMapper::toDTO)
+                    .toList();
+        }
+        throw new AcessoNegadoException("acesso negado");
     }
 
 

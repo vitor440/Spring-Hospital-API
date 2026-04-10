@@ -70,6 +70,8 @@ public interface PacienteControllerDocs {
     })
     ResponseEntity<PacienteResponse> obterPacientePeloId(@PathVariable("id") Long id);
 
+    public ResponseEntity<PacienteResponse> obterPacienteLogado();
+
     @Operation(summary = "listar pacientes", description = "pesquisa paciente pelo nome, gênero e tipo sanguinero.")
     ResponseEntity<Page<PacienteResponse>> listarPacientes(
             @RequestParam(value = "nome", required = false) String nome,
@@ -100,6 +102,10 @@ public interface PacienteControllerDocs {
     ResponseEntity<List<ConsultaResponse>> historicoConsultas(@PathVariable("id") Long id);
 
     ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadas(@PathVariable("id") Long id);
+
+    public ResponseEntity<List<ConsultaResponse>> historicoConsultasPacienteLogado();
+
+    public ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadasPacienteLogado();
 
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file);
 }

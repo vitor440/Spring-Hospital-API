@@ -2,6 +2,7 @@ package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.TurnoAtendimentoRequest;
 import com.gerenciamento_hospitalar.dto.response.TurnoAtendimentoResponse;
+import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.TurnoAtendimentoMapper;
 import com.gerenciamento_hospitalar.model.TurnoAtendimento;
@@ -28,6 +29,7 @@ public class TurnoAtendimentoService {
     private final TurnoAtendimentoRepository turnoAtendimentoRepository;
     private final TurnoAtendimentoValidator validator;
     private final MedicoRepository medicoRepository;
+    private final SecurityService securityService;
     private final TurnoAtendimentoMapper mapper;
 
 
@@ -68,6 +70,17 @@ public class TurnoAtendimentoService {
         throw new RuntimeException("Não existe disponibilidade com esse ID!");
     }
 
+    public TurnoAtendimentoResponse atualizarDisponibilidadeMedico2(Long turnoId, TurnoAtendimentoRequest request) {
+
+        TurnoAtendimento turno = obterTurnoPorIdOuLancarExcecao(turnoId);
+
+        turno.setDiaSemana(request.diaSemana());
+        turno.setHoraInicio(request.horaInicio());
+        turno.setHoraFim(request.horaFim());
+
+        return mapper.toDTO(turnoAtendimentoRepository.save(turno));
+    }
+
 
 
     public TurnoAtendimentoResponse obterPeloId(Long id) {
@@ -85,13 +98,12 @@ public class TurnoAtendimentoService {
         Pageable pageable = PageRequest.of(pagina, tamanho);
 
         Medico medico = obterMedicoPorIdOuLancarExcecao(id);
-        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if(user.getRoles().contains("MEDICO") && !user.getId().equals(medico.getUsuario())) throw new RuntimeException("Acesso negado!");
 
         List<TurnoAtendimento> disponibilidades = medico.getDisponibilidades();
 
-        if(disponibilidades == null || disponibilidades.isEmpty()) return List.of();
+        if(disponibilidades == null || disponibilidades.isEmpty()) {
+            return List.of();
+        }
 
         return disponibilidades.stream().map(mapper::toDTO).toList();
     }
@@ -123,7 +135,31 @@ public class TurnoAtendimentoService {
 
     }
 
+    public void deletarPeloIdMedico2(Long id) {
+        TurnoAtendimento turno = obterTurnoPorIdOuLancarExcecao(id);
+        validator.validarDelecao(turno);
+        turnoAtendimentoRepository.delete(turno);
+    }
 
+    @Transactional
+    public List<TurnoAtendimentoResponse> obterTurnosDeMedicoLogado() {
+        Usuario usuario = securityService.getUsuarioLogado();
+        if(!usuario.getRoles().contains("MEDICO")) {
+            throw new AcessoNegadoException("acesso negado!");
+        }
+
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
+
+        if(medicoOpt.isPresent()) {
+            Medico medico = medicoOpt.get();
+            List<TurnoAtendimento> turnos = medico.getDisponibilidades();
+            if (turnos == null) return List.of();
+
+            return turnos.stream().map(mapper::toDTO).toList();
+        }
+
+        throw new AcessoNegadoException("acesso negado!");
+    }
 
     private TurnoAtendimento obterTurnoPorIdOuLancarExcecao(Long id) {
         return turnoAtendimentoRepository.findById(id)

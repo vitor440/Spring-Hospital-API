@@ -1,7 +1,6 @@
 package com.gerenciamento_hospitalar.controller;
 
 import com.gerenciamento_hospitalar.controller.docs.MedicoControllerDocs;
-import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.TurnoAtendimentoRequest;
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
@@ -10,13 +9,6 @@ import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.model.Especialidade;
 import com.gerenciamento_hospitalar.service.TurnoAtendimentoService;
 import com.gerenciamento_hospitalar.service.MedicoService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,10 +53,17 @@ public class MedicoController implements MedicoControllerDocs {
 
     @GetMapping("/{id}")
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<MedicoResponse> obterMedicoPeloId(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(service.obterMedicoPeloId(id));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('MEDICO')")
+    @Override
+    public ResponseEntity<MedicoResponse> obterMedicoLogado() {
+        return ResponseEntity.ok(service.obterMedicoLogado());
     }
 
     @GetMapping
@@ -90,65 +89,33 @@ public class MedicoController implements MedicoControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/turnos-atendimento")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<TurnoAtendimentoResponse> addTurnoMedico(@PathVariable("id") Long id,
-                                                                   @RequestBody TurnoAtendimentoRequest request) {
-        TurnoAtendimentoResponse response = turnoAtendimentoService.addDisponibilidadeMedico(id, request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @PutMapping("/{id}/turnos-atendimento/{turnoId}")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<TurnoAtendimentoResponse> atualizarTurnoMedico(@PathVariable("id") Long id,
-                                                                         @PathVariable("turnoId") Long turnoId,
-                                                                         @RequestBody TurnoAtendimentoRequest request) {
-        return ResponseEntity.ok(turnoAtendimentoService.atualizarDisponibilidadeMedico(id, turnoId, request));
-    }
-
-    @GetMapping("/{id}/turnos-atendimento")
-    @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'MEDICO')")
-    public ResponseEntity<List<TurnoAtendimentoResponse>> listarTurnos(
-            @PathVariable("id") Long id,
-            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
-            @RequestParam(value = "tamanho", defaultValue = "6") int tamanho
-    ) {
-
-        return ResponseEntity.ok(turnoAtendimentoService.listarDisponibilidades(id, pagina, tamanho));
-    }
-
-    @DeleteMapping("/{id}/turnos-atendimento/{turnoId}")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id,
-                                                                             @PathVariable("turnoId") Long turnoId) {
-        turnoAtendimentoService.deletarPeloIdMedico(id, turnoId);
-        return ResponseEntity.noContent().build();
-    }
-
-
     @GetMapping("/{id}/consultas")
     @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'MEDICO')")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
     public ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultas(id));
     }
 
     @GetMapping("/{id}/consultasAgendadas")
     @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'MEDICO')")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadas(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultasAgendadas(id));
     }
 
+    @GetMapping("/me/consultas")
+    @PreAuthorize("hasRole('MEDICO')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasDoMedicoLogado() {
+        return ResponseEntity.ok(service.obterConsultasDoMedicoLogado());
+    }
+
+    @GetMapping("/me/consultasAgendadas")
+    @PreAuthorize("hasRole('MEDICO')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasDoMedicoLogado() {
+        return ResponseEntity.ok(service.obterConsultasAgendadasDoMedicoLogado());
+    }
 
 
     @PostMapping("/importar")

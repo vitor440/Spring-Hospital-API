@@ -1,6 +1,7 @@
 package com.gerenciamento_hospitalar.repository;
 
 import com.gerenciamento_hospitalar.model.Paciente;
+import com.gerenciamento_hospitalar.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -9,4 +10,6 @@ import java.util.Optional;
 public interface PacienteRepository extends JpaRepository<Paciente, Long>, JpaSpecificationExecutor<Paciente> {
 
     Optional<Paciente> findByCpf(String cpf);
+
+    Optional<Paciente> findByUsuario(Usuario usuario);
 }

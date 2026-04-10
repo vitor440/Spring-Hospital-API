@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,7 +79,9 @@ public interface MedicoControllerDocs {
     ResponseEntity<MedicoResponse> obterMedicoPeloId(@PathVariable("id") Long id);
 
 
-
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('MEDICO')")
+    ResponseEntity<MedicoResponse> obterMedicoLogado();
 
     @Operation(summary = "listar médicos", description = "pesquisa médicos pelo nome e especialidade.")
     ResponseEntity<Page<MedicoResponse>> listarMedicos(
@@ -109,79 +112,6 @@ public interface MedicoControllerDocs {
 
 
 
-    @Operation(summary = "adicionar turno de atendimento", description = "adiciona turno de atendimento para um médico.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = TurnoAtendimentoResponse.class))
-            ),
-            @ApiResponse(description = "médico não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-            @ApiResponse(description = "Conflito de turnos", responseCode = "409",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<TurnoAtendimentoResponse> addTurnoMedico(@PathVariable("id") Long id,
-                                                            @RequestBody TurnoAtendimentoRequest request);
-
-
-
-    @Operation(summary = "atualizar turno de atendimento", description = "atualiza turno de atendimento de um médico.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "200",
-                    content = @Content(schema = @Schema(implementation = TurnoAtendimentoResponse.class))
-            ),
-            @ApiResponse(description = "médico/turno não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-            @ApiResponse(description = "Conflito de turnos", responseCode = "409",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-
-    })
-    ResponseEntity<TurnoAtendimentoResponse> atualizarTurnoMedico(@PathVariable("id") Long id,
-                                                                  @PathVariable("turnoId") Long turnoId,
-                                                                  @RequestBody TurnoAtendimentoRequest request);
-
-
-
-
-    @Operation(summary = "listar turnos de atendimentos", description = "lista todas os turnos de atendimentos de um médico.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "200",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = TurnoAtendimentoResponse.class)))
-            ),
-            @ApiResponse(description = "médico não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<List<TurnoAtendimentoResponse>> listarTurnos(
-            @PathVariable("id") Long id,
-            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
-            @RequestParam(value = "tamanho", defaultValue = "6") int tamanho
-    );
-
-
-
-
-    @Operation(summary = "deletar turno de atendimento", description = "deleta turno de atendimento de um médico.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "204",
-                    content = @Content
-            ),
-            @ApiResponse(description = "médico não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-            @ApiResponse(description = "não é permitida a deleção de turnos com consultas agendadas.", responseCode = "409",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-
-    })
-    ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id,
-                                                                      @PathVariable("turnoId") Long turnoId);
-
-
-
     @Operation(summary = "obter consultas", description = "lista todas as consultas de um médico.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "200",
@@ -192,6 +122,14 @@ public interface MedicoControllerDocs {
             )
     })
     ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id);
+
+    @GetMapping("/me/consultas")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
+    ResponseEntity<List<ConsultaResponse>> obterConsultasDoMedicoLogado();
+
+    @GetMapping("/me/consultasAgendadas")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
+    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasDoMedicoLogado();
 
     public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadas(@PathVariable("id") Long id);
 

@@ -97,61 +97,6 @@ public interface ConsultaControllerDocs {
 
 
 
-    @Operation(summary = "adicionar resultado consulta", description = "cria um resultado para uma consulta.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = ResultadoConsultaResponse.class))
-            ),
-            @ApiResponse(description = "consulta não encontrada", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<ResultadoConsultaResponse> gerarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request);
-
-
-
-
-    @Operation(summary = "obter resultado de uma consulta", description = "obtém o resultado de uma consulta pelo id da consulta.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = ResultadoConsultaResponse.class))
-            ),
-            @ApiResponse(description = "consulta não encontrada", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long consultaId);
-
-
-
-
-    @Operation(summary = "atualizar resultado de uma consulta", description = "atualiza o resultado de uma consulta existente.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = ResultadoConsultaResponse.class))
-            ),
-            @ApiResponse(description = "consulta não encontrada ou consulta sem resultado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            ),
-    })
-    ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request);
-
-
-
-
-    @Operation(summary = "deletar resultado consulta", description = "deleta o resultado de uma consulta.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "204",
-                    content = @Content
-            ),
-            @ApiResponse(description = "consulta não encontrada ou consulta sem resultado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long consultaId);
-
-
-
 
     @Operation(summary = "alterar status da consulta", description = "altera o status de uma consulta para REALIZADA.")
     @ApiResponses({
