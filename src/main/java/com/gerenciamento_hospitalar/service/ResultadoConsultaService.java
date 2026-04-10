@@ -1,22 +1,18 @@
 package com.gerenciamento_hospitalar.service;
 
-import com.gerenciamento_hospitalar.dto.request.PrescricaoMedicamentoRequest;
+import com.gerenciamento_hospitalar.dto.request.MedicamentoRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
-import com.gerenciamento_hospitalar.mapper.PrescricaoMapper;
-import com.gerenciamento_hospitalar.mapper.PrescricaoMedicamentoMapper;
+import com.gerenciamento_hospitalar.mapper.MedicamentoMapper;
 import com.gerenciamento_hospitalar.mapper.ResultadoConsultaMapper;
 import com.gerenciamento_hospitalar.model.*;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
-import com.gerenciamento_hospitalar.repository.MedicamentoRepository;
 import com.gerenciamento_hospitalar.repository.ResultadoConsultaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +20,8 @@ public class ResultadoConsultaService {
 
     private final ResultadoConsultaRepository resultadoConsultaRepository;
     private final ConsultaRepository consultaRepository;
-    private final MedicamentoRepository medicamentoRepository;
     private final ResultadoConsultaMapper mapper;
-    private final PrescricaoMedicamentoMapper medicamentoMapper;
+    private final MedicamentoMapper medicamentoMapper;
 
 
     @Transactional
@@ -48,7 +43,7 @@ public class ResultadoConsultaService {
             rs.getPrescricao().setMedicoId(consulta.getMedico().getId());
             rs.getPrescricao().setPacienteId(consulta.getPaciente().getId());
 
-            for (PrescricaoMedicamento medicamento : rs.getPrescricao().getMedicamentos()) {
+            for (Medicamento medicamento : rs.getPrescricao().getMedicamentos()) {
                 medicamento.setPrescricao(rs.getPrescricao());
             }
         }
@@ -80,8 +75,8 @@ public class ResultadoConsultaService {
 
             rs.getPrescricao().getMedicamentos().clear();
 
-            for (PrescricaoMedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
-                PrescricaoMedicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
+            for (MedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
+                Medicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
                 medicamento.setPrescricao(rs.getPrescricao());
                 rs.getPrescricao().getMedicamentos().add(medicamento);
             }
@@ -123,10 +118,5 @@ public class ResultadoConsultaService {
     private ResultadoConsulta obterResultadoConsultaPeloIdOuLancarExcecao(Long id) {
         return resultadoConsultaRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe consulta com esse ID!"));
-    }
-
-    private Medicamento obterMedicamentoPeloIdOuLancarExcecao(Long id) {
-        return medicamentoRepository.findById(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe medicamento com esse ID!"));
     }
 }

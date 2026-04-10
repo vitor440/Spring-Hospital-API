@@ -9,5 +9,5 @@ public record PrescricaoResponse(Long id,
                                  Long consultaId,
                                  LocalDate dataPrescricao,
                                  String comentarios,
-                                 List<PrescricaoMedicamentoResponse> medicamentos) {
+                                 List<MedicamentoResponse> medicamentos) {
 }

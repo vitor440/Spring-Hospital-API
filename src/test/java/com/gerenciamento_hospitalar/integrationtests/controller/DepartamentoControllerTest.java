@@ -9,6 +9,7 @@ import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.dto.security.CadastroUsuarioDTO;
 import com.gerenciamento_hospitalar.dto.security.TokenDTO;
 import com.gerenciamento_hospitalar.integrationtests.AbstractIntegrationTest;
+import com.gerenciamento_hospitalar.integrationtests.dto.DepartamentoPageContent;
 import com.gerenciamento_hospitalar.model.Departamento;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static io.restassured.RestAssured.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,12 +36,11 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
 
     private static DepartamentoRequest request;
     private static DepartamentoResponse response;
-    private static Departamento departamento;
-    private static TokenDTO tokenDTO;
+    private static TokenDTO tokenAdmin;
+    private static RequestSpecification specification;
 
     @BeforeAll
     static void setUpAll() {
-        departamento = mockDepartamento();
         request = mockRequest();
         response = mockResponse();
 
@@ -50,20 +51,18 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
+
     @Test
     @Order(1)
-    void createUserAndGetToken() throws JsonProcessingException {
-        CadastroUsuarioDTO usuarioDTO = new CadastroUsuarioDTO(null, "admin", "admin123", "admin");
-        RequestSpecification specification = new RequestSpecBuilder()
-                .setBasePath("/auth/createUser")
+    void getToken() throws JsonProcessingException {
+        specification = new RequestSpecBuilder()
+                .setBasePath("/auth/singin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
-        given(specification)
+        var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .basePath("/auth/createUser")
-                .port(TestConfig.SERVER_PORT)
-                .body(usuarioDTO)
+                .body(new CadastroUsuarioDTO(null, "admin", "admin123", "admin"))
                 .when()
                 .post()
                 .then()
@@ -72,32 +71,16 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        var content = given(specification)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .basePath("/auth/singin")
-                    .port(TestConfig.SERVER_PORT)
-                    .body(usuarioDTO)
-                    .when()
-                    .post()
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .body()
-                    .asString();
+        tokenAdmin = objectMapper.readValue(content, TokenDTO.class);
+        assertNotNull(tokenAdmin.acessToken());
+        assertNotNull(tokenAdmin.refreshToken());
 
-        tokenDTO = objectMapper.readValue(content, TokenDTO.class);
-        assertNotNull(tokenDTO.acessToken());
-        assertNotNull(tokenDTO.refreshToken());
+        assertEquals(tokenAdmin.username(), "admin");
+        assertTrue(tokenAdmin.authenticated());
     }
 
     @Test
     @Order(2)
-    void setRoleAdmin() {
-
-    }
-
-    @Test
-    @Order(3)
     void addDepartamento() throws JsonProcessingException {
 
         RequestSpecification specification = new RequestSpecBuilder()
@@ -107,7 +90,7 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
 
        var content =  given(specification)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenDTO.acessToken())
+                    .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
                     .body(request)
                     .when()
                     .post()
@@ -120,29 +103,128 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
        response = objectMapper.readValue(content, DepartamentoResponse.class);
 
        assertNotNull(response.id());
+       assertNotNull(response.dataCriacao());
+       assertTrue(response.id() > 0);
+
+       assertEquals(response.nome(), "Cardiologia");
+       assertEquals(response.localizacao(), "quinto andar");
 
     }
 
     @Test
-    void atualizarDepartamento() {
+    @Order(3)
+    void atualizarDepartamento() throws JsonProcessingException {
+        DepartamentoRequest requestAtualizado = new DepartamentoRequest("Cardiologia", "oitavo andar");
+
+        specification = new RequestSpecBuilder()
+                .setBasePath("/departamentos/{id}")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
+                .pathParam("id", response.id())
+                .body(requestAtualizado)
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        response = objectMapper.readValue(content, DepartamentoResponse.class);
+
+        assertNotNull(response.id());
+        assertNotNull(response.dataCriacao());
+        assertTrue(response.id() > 0);
+
+        assertEquals(response.nome(), "Cardiologia");
+        assertEquals(response.localizacao(), "oitavo andar");
     }
 
     @Test
-    void obterDepartamentoPeloId() {
+    void obterDepartamentoPeloId() throws JsonProcessingException {
+        specification = new RequestSpecBuilder()
+                .setBasePath("/departamentos/{id}")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
+                .pathParam("id", response.id())
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        response = objectMapper.readValue(content, DepartamentoResponse.class);
+
+        assertNotNull(response.id());
+        assertNotNull(response.dataCriacao());
+        assertTrue(response.id() > 0);
+
+        assertEquals(response.nome(), "Cardiologia");
+        assertEquals(response.localizacao(), "oitavo andar");
     }
 
     @Test
-    void listarDepartamentos() {
+    void listarDepartamentos() throws JsonProcessingException {
+        specification = new RequestSpecBuilder()
+                .setBasePath("/departamentos")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
+                .queryParams("pagina", 0, "tamanho", 6, "direction", "ASC")
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        var page = objectMapper.readValue(content, DepartamentoPageContent.class);
+
+        List<DepartamentoResponse> lista = page.getContent();
+
+        DepartamentoResponse departamento0 = lista.get(0);
+
+        assertEquals(departamento0.nome(), "cardiologia");
+        assertEquals(departamento0.localizacao(), "quinto andar");
+
+        DepartamentoResponse departamento3 = lista.get(2);
+
+        assertEquals(departamento3.nome(), "hepatologia");
+        assertEquals(departamento3.localizacao(), "terceiro andar");
+
+
     }
 
     @Test
     void deletarDepartamentoPeloId() {
-    }
+        specification = new RequestSpecBuilder()
+                .setBasePath("/departamentos/{id}")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
 
-    @Test
-    void importarDados() {
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
+                .pathParam("id", response.id())
+                .when()
+                .delete()
+                .then()
+                .statusCode(204);
     }
-
 
     private static Departamento mockDepartamento() {
         Departamento departamento1 = new Departamento();
@@ -151,15 +233,6 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
 
         return departamento1;
     }
-
-    private static Departamento mockDepartamentoSalvo() {
-        Departamento departamento1 = mockDepartamento();
-        departamento1.setId(1L);
-        departamento1.setDataCriacao(LocalDateTime.of(2026, 4, 4, 14, 7, 30));
-
-        return departamento1;
-    }
-
 
     private static DepartamentoRequest mockRequest() {
         DepartamentoRequest request1 = new DepartamentoRequest("Cardiologia", "quinto andar");

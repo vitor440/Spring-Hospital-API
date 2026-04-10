@@ -1,5 +1,7 @@
 package com.gerenciamento_hospitalar.dto.response;
 
+import java.time.LocalDate;
+
 public record PacienteResponse(Long id,
                                String cpf,
                                String nome,
@@ -8,5 +10,5 @@ public record PacienteResponse(Long id,
                                String email,
                                String telefone,
                                String tipoSanguineo,
-                               String dataNascimento) {
+                               LocalDate dataNascimento) {
 }

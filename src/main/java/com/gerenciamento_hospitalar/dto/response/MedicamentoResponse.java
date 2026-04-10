@@ -1,9 +1,11 @@
 package com.gerenciamento_hospitalar.dto.response;
 
 public record MedicamentoResponse(Long id,
+                                  Long prescricaoId,
                                   String nome,
-                                  String marca,
                                   String tipo,
                                   String descricao,
-                                  int estoque) {
+                                  String dosagem,
+                                  String frequencia,
+                                  String duracao) {
 }

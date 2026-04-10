@@ -2,15 +2,9 @@ package com.gerenciamento_hospitalar.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "medicamento")
-@ToString(exclude = "prescricoes")
 @Data
 public class Medicamento {
 
@@ -18,11 +12,12 @@ public class Medicamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome")
-    private String nome;
+    @ManyToOne
+    @JoinColumn(name = "prescricao_id")
+    private Prescricao prescricao;
 
-    @Column(name = "marca")
-    private String marca;
+    @Column(name = "nome_medicamento")
+    private String nome;
 
     @Column(name = "tipo")
     private String tipo;
@@ -30,9 +25,12 @@ public class Medicamento {
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "estoque")
-    private int estoque;
+    @Column(name = "dosagem")
+    private String dosagem;
 
-//    @OneToMany(mappedBy = "medicamento")
-//    private List<PrescricaoMedicamento> prescricoes;
+    @Column(name = "frequencia")
+    private String frequencia;
+
+    @Column(name = "duracao")
+    private String duracao;
 }

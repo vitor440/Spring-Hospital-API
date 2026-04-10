@@ -43,15 +43,6 @@ public class ConsultaService {
         return mapper.toDTO(consultaRepository.save(consulta));
     }
 
-    public Page<ConsultaResponse> listarConsultas(int pagina, int tamanho, String direction) {
-
-        var sort = direction.equalsIgnoreCase("asc") ? Direction.ASC : Direction.DESC;
-        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "data");
-        Page<Consulta> consultas = consultaRepository.findAll(pageable);
-
-        return consultas.map(mapper::toDTO);
-    }
-
     public ConsultaResponse atualizarConsulta(Long id, ConsultaRequest request) {
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(id);
 
@@ -68,6 +59,15 @@ public class ConsultaService {
 
         validator.validar(consulta);
         return mapper.toDTO(consultaRepository.save(consulta));
+    }
+
+    public Page<ConsultaResponse> listarConsultas(int pagina, int tamanho, String direction) {
+
+        var sort = direction.equalsIgnoreCase("asc") ? Direction.ASC : Direction.DESC;
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "data");
+        Page<Consulta> consultas = consultaRepository.findAll(pageable);
+
+        return consultas.map(mapper::toDTO);
     }
 
 

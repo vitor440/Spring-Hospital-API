@@ -1,1 +1,0 @@
-ALTER TABLE prescricao_medicamento ALTER COLUMN prescricao_id DROP NOT NULL;

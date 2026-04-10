@@ -38,6 +38,6 @@ public class Prescricao {
     private String comentarios;
 
     @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PrescricaoMedicamento> medicamentos;
+    private List<Medicamento> medicamentos;
 
 }

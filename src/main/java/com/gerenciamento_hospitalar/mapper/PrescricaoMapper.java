@@ -6,7 +6,7 @@ import com.gerenciamento_hospitalar.model.Prescricao;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = PrescricaoMedicamentoMapper.class)
+@Mapper(componentModel = "spring", uses = MedicamentoMapper.class)
 public interface PrescricaoMapper {
 
     Prescricao toEntity(PrescricaoRequest request);

@@ -38,8 +38,9 @@ create table consulta(
      data date not null,
      hora time not null,
      status varchar(30) not null,
-     dia_semana integer not null,
-     constraint chk_status check(status in ('AGENDADA','REALIZADA','CANCELADA','FALTANTE'))
+     dia_semana varchar(50) not null,
+     constraint chk_status check(status in ('AGENDADA','REALIZADA','CANCELADA','FALTANTE')),
+     constraint chk_dia_semana check (dia_semana in ('SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO', 'DOMINGO'))
 );
 
 
@@ -52,21 +53,14 @@ create table prescricao(
    comentarios varchar(500)
 );
 
-create table medicamento(
-    id bigint generated always as identity primary key,
-    nome varchar(100) not null,
-    marca varchar(80),
-    tipo varchar(30) not null,
-    descricao varchar(500) not null,
-    estoque int not null
-);
 
 create table resultado_consulta(
    id bigint generated always as identity primary key,
    medico_id bigint not null,
    paciente_id bigint not null,
-   consulta_id bigint references consulta(id) unique not null,
-   sintomas varchar(500),
+   consulta_id bigint references consulta(id) unique,
+   prescricao_id bigint references prescricao(id) unique,
+   sintomas text[],
    diagnostico varchar(300),
    tratamento varchar(300),
    notas varchar(300),
@@ -74,10 +68,12 @@ create table resultado_consulta(
    data_criaca timestamp
 );
 
-create table prescricao_medicamento(
+create table medicamento(
        id bigint generated always as identity primary key,
-       prescricao_id bigint references prescricao(id) not null,
-       medicamento_id bigint references medicamento(id) not null,
+       prescricao_id bigint references prescricao(id),
+       nome_medicamento varchar(150),
+       tipo varchar(150),
+       descricao varchar(150),
        dosagem varchar(50) not null,
        frequencia varchar(100) not null,
        duracao varchar(50) not null

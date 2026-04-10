@@ -73,7 +73,7 @@ public class PacienteService {
     public PacienteResponse obterPacientePeloId(Long id) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
         securityService.validaUsuarioPaciente(paciente);
-        return mapper.toDTO(obterPacientePeloIdOuLancarExcecao(id));
+        return mapper.toDTO(paciente);
     }
 
     public void deletarPaciente(Long id) {
