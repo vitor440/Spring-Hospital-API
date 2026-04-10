@@ -73,7 +73,6 @@ public class MedicoService {
 
     public MedicoResponse obterMedicoPeloId(Long id) {
         Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioMedico(medico);
 
         return mapper.toDTO(medico);
     }
@@ -122,7 +121,6 @@ public class MedicoService {
     @Transactional
     public List<ConsultaResponse> obterConsultas(Long id) {
         Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioMedico(medico);
 
         List<Consulta> consultas = medico.getConsultas();
 
@@ -151,7 +149,6 @@ public class MedicoService {
     @Transactional
     public List<ConsultaResponse> obterConsultasAgendadas(Long id) {
         Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-        securityService.validaUsuarioMedico(medico);
 
         List<Consulta> consultas = medico.getConsultas().stream()
                 .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)

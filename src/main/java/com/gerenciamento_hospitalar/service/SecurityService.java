@@ -30,27 +30,5 @@ public class SecurityService {
         throw new RuntimeException("Usuário não autenticado");
     }
 
-    public void validaUsuarioMedico(Medico medico) {
-
-        Usuario usuario = getUsuarioLogado();
-
-        boolean temRoleMedico = usuario.getRoles().contains("MEDICO");
-
-        if(temRoleMedico && !usuario.getId().equals(medico.getUsuario().getId())) {
-            throw new AcessoNegadoException("acesso negado.");
-        }
-    }
-
-    public void validaUsuarioPaciente(Paciente paciente) {
-
-        Usuario usuario = getUsuarioLogado();
-
-        boolean temRoleMedico = usuario.getRoles().contains("PACIENTE");
-
-        if(temRoleMedico && !usuario.getId().equals(paciente.getUsuario().getId())) {
-            throw new AcessoNegadoException("acesso negado.");
-        }
-    }
-
 
 }
