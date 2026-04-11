@@ -2,11 +2,8 @@ package com.gerenciamento_hospitalar.mocks;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
-import com.gerenciamento_hospitalar.model.Departamento;
 import com.gerenciamento_hospitalar.model.Especialidade;
 import com.gerenciamento_hospitalar.model.Medico;
-
-import java.time.LocalDateTime;
 
 public class MedicoMock {
 
@@ -18,6 +15,7 @@ public class MedicoMock {
         medico1.setTelefone("Telefone" + i);
         medico1.setEspecialidade(i % 2 == 0? Especialidade.NEUROLOGISTA: Especialidade.CARDIOLOGISTA);
         medico1.setDepartamento(DepartamentoMock.mockDepartamento(i));
+        medico1.setUsuario(UsuarioMock.mockUsuario(1));
 
         return medico1;
     }

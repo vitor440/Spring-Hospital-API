@@ -2,15 +2,18 @@ package com.gerenciamento_hospitalar.unittests.service;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
+import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
 import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
-import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
+import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
 import com.gerenciamento_hospitalar.mapper.MedicoMapper;
-import com.gerenciamento_hospitalar.model.Consulta;
+import com.gerenciamento_hospitalar.mocks.DepartamentoMock;
+import com.gerenciamento_hospitalar.mocks.MedicoMock;
+import com.gerenciamento_hospitalar.mocks.UsuarioMock;
 import com.gerenciamento_hospitalar.model.Departamento;
-import com.gerenciamento_hospitalar.model.Especialidade;
 import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.model.Usuario;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import com.gerenciamento_hospitalar.repository.UsuarioRepository;
@@ -26,7 +29,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -37,19 +39,19 @@ import static org.mockito.Mockito.*;
 class MedicoServiceTest {
 
     @Mock
-    MedicoRepository medicoRepository;
+    private MedicoRepository medicoRepository;
 
     @Mock
-    MedicoValidator validator;
+    private MedicoValidator validator;
 
     @Mock
-    MedicoMapper mapper;
+    private MedicoMapper mapper;
 
     @Mock
-    ConsultaMapper consultaMapper;
+    private DepartamentoRepository departamentoRepository;
 
     @Mock
-    DepartamentoRepository departamentoRepository;
+    private MedicoImporterFactory factory;
 
     @Mock
     private SecurityService securityService;
@@ -58,288 +60,281 @@ class MedicoServiceTest {
     private UsuarioRepository usuarioRepository;
 
     @InjectMocks
-    MedicoService service;
+    private MedicoService service;
 
-    Medico medico;
-    Medico medicoSalvo;
-    MedicoRequest request;
-    MedicoResponse response;
+    private Medico medico;
+    private MedicoRequest request;
+    private MedicoResponse response;
+    private Departamento departamento;
+    private Usuario usuario;
+
 
     @BeforeEach
     void setUp() {
-        medico = mockMedico();
-        medicoSalvo = mockMedicoSalvo();
-        request = mockRequest();
-        response = mockResponse();
+        medico = MedicoMock.mockMedico(1);
+        request = MedicoMock.mockRequest(1);
+        response = MedicoMock.mockResponse(1);
+        usuario = UsuarioMock.mockUsuario(1);
+        departamento = DepartamentoMock.mockDepartamento(1);
     }
 
     @Test
     void addMedico() {
         // 1.cenário
         when(mapper.toEntity(request)).thenReturn(medico);
-        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(mockDepartamento()));
-        doNothing().when(validator).validar(medico);
-        when(medicoRepository.save(medico)).thenReturn(medicoSalvo);
-        when(mapper.toDTO(medicoSalvo)).thenReturn(response);
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(medicoRepository.save(medico)).thenReturn(medico);
+        when(mapper.toDTO(medico)).thenReturn(response);
 
-        // 2. execução
+        // 2.execução
         var resultado = service.addMedico(request);
 
-        // 3.verificação
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.crm(), response.crm());
-        assertEquals(resultado.email(), response.email());
-        assertEquals(resultado.telefone(), response.telefone());
-        assertEquals(resultado.especialidade(), response.especialidade());
-        assertEquals(resultado.departamentoId(), response.departamentoId());
-
+        // 3. verificação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
+        verify(validator, times(1)).validar(medico);
         verify(medicoRepository, times(1)).save(medico);
+        verify(mapper, times(1)).toDTO(medico);
     }
 
     @Test
     void addMedicoComDepartamentoInexistente() {
         // 1.cenário
         when(mapper.toEntity(request)).thenReturn(medico);
-        doThrow(RegistroNaoEncontradoException.class).when(departamentoRepository).findById(1L);
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.empty());
 
-
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.addMedico(request));
 
-        // 3.verificação
-
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
+        // 3. verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe departamento com esse ID!");
+        verify(validator, times(0)).validar(medico);
         verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
     }
 
+    @Test
+    void addMedicoComUsuarioInexistente() {
+        // 1.cenário
+        when(mapper.toEntity(request)).thenReturn(medico);
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.addMedico(request));
+
+        // 3. verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe usuario com esse ID!");
+        verify(validator, times(0)).validar(medico);
+        verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
+    }
 
     @Test
     void addMedicoComCrmDuplicado() {
         // 1.cenário
         when(mapper.toEntity(request)).thenReturn(medico);
-        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(mockDepartamento()));
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         doThrow(RegistroDuplicadoException.class).when(validator).validar(medico);
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.addMedico(request));
 
-        // 3.verificação
-
+        // 3. verificação
         assertThat(resultado).isInstanceOf(RegistroDuplicadoException.class);
+        verify(validator, times(1)).validar(medico);
         verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
     }
-
 
     @Test
     void atualizarMedico() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(mockDepartamento()));
-        doNothing().when(validator).validar(medicoSalvo);
-        when(medicoRepository.save(medicoSalvo)).thenReturn(medicoSalvo);
-        when(mapper.toDTO(medicoSalvo)).thenReturn(response);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(medicoRepository.save(medico)).thenReturn(medico);
+        when(mapper.toDTO(medico)).thenReturn(response);
 
-        // 2. execução
+        // 2.execução
         var resultado = service.atualizarMedico(1L, request);
 
-        // 3.verificação
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.crm(), response.crm());
-        assertEquals(resultado.email(), response.email());
-        assertEquals(resultado.telefone(), response.telefone());
-        assertEquals(resultado.especialidade(), response.especialidade());
-        assertEquals(resultado.departamentoId(), response.departamentoId());
-
-        verify(medicoRepository, times(1)).save(medicoSalvo);
+        // 3. verificação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
+        verify(validator, times(1)).validar(medico);
+        verify(medicoRepository, times(1)).save(medico);
+        verify(mapper, times(1)).toDTO(medico);
     }
-
-
-    @Test
-    void atualizarMedicoInexistente() {
-        // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(medicoRepository).findById(1L);
-
-        // 2. execução
-        var resultado = catchThrowable(() -> service.atualizarMedico(1L, request));
-
-        // 3.verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
-
-        verify(medicoRepository, times(0)).save(medicoSalvo);
-    }
-
 
     @Test
     void atualizarMedicoComDepartamentoInexistente() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        doThrow(RegistroNaoEncontradoException.class).when(departamentoRepository).findById(1L);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // 2. execução
+
+        // 2.execução
         var resultado = catchThrowable(() -> service.atualizarMedico(1L, request));
 
-        // 3.verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
-
-        verify(medicoRepository, times(0)).save(medicoSalvo);
+        // 3. verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe departamento com esse ID!");
+        verify(validator, times(0)).validar(medico);
+        verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
     }
-
 
     @Test
     void atualizarMedicoComCrmDuplicado() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(mockDepartamento()));
-        doThrow(RegistroDuplicadoException.class).when(validator).validar(medicoSalvo);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        doThrow(RegistroDuplicadoException.class).when(validator).validar(medico);
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.atualizarMedico(1L, request));
 
-        // 3.verificação
+        // 3. verificação
         assertThat(resultado).isInstanceOf(RegistroDuplicadoException.class);
-
-        verify(medicoRepository, times(0)).save(medicoSalvo);
+        verify(validator, times(1)).validar(medico);
+        verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
     }
 
+    @Test
+    void atualizarMedicoComUsuarioInexistente() {
+        // 1.cenário
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.atualizarMedico(1L, request));
+
+        // 3. verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe usuario com esse ID!");
+        verify(validator, times(0)).validar(medico);
+        verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
+    }
+
+    @Test
+    void atualizarMedicoInexistente() {
+        // 1.cenário
+        when(medicoRepository.findById(1L)).thenReturn(Optional.empty());
+
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.atualizarMedico(1L, request));
+
+        // 3. verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe médico com esse ID!");
+        verify(validator, times(0)).validar(medico);
+        verify(medicoRepository, times(0)).save(medico);
+        verify(mapper, times(0)).toDTO(medico);
+    }
 
     @Test
     void obterMedicoPeloId() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        when(mapper.toDTO(medicoSalvo)).thenReturn(response);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        when(mapper.toDTO(medico)).thenReturn(response);
 
-        // 2. execução
+        // 2.execução
         var resultado = service.obterMedicoPeloId(1L);
 
-        // 3.verificação
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.crm(), response.crm());
-        assertEquals(resultado.email(), response.email());
-        assertEquals(resultado.telefone(), response.telefone());
-        assertEquals(resultado.especialidade(), response.especialidade());
-        assertEquals(resultado.departamentoId(), response.departamentoId());
-
-        verify(medicoRepository, times(1)).findById(1L);
-        verify(mapper, times(1)).toDTO(medicoSalvo);
+        // 3. verficação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
+        verify(mapper, times(1)).toDTO(medico);
     }
 
     @Test
-    void obterMedicoPeloIdInexistente() {
+    void obterMedicoInexistente() {
         // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(medicoRepository).findById(1L);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.obterMedicoPeloId(1L));
 
-        // 3.verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
-
-        verify(medicoRepository, times(1)).findById(1L);
-        verify(mapper, times(0)).toDTO(medicoSalvo);
+        // 3. verficação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe médico com esse ID!");
+        verify(mapper, times(0)).toDTO(medico);
     }
+
+
+
+    @Test
+    void obterDadosMedicoLogado() {
+        // 1.cenário
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
+        when(medicoRepository.findByUsuario(usuario)).thenReturn(Optional.empty());
+
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.obterMedicoLogado());
+
+        // 3. verficação
+        assertThat(resultado).isInstanceOf(AcessoNegadoException.class).hasMessage("acesso negado.");
+        verify(mapper, times(0)).toDTO(medico);
+    }
+
+    @Test
+    void usuarioMedicoObtendoDadosDeOutroUsuario() {
+        // 1.cenário
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
+        when(medicoRepository.findByUsuario(usuario)).thenReturn(Optional.of(medico));
+        when(mapper.toDTO(medico)).thenReturn(response);
+
+        // 2.execução
+        var resultado = service.obterMedicoLogado();
+
+        // 3. verficação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
+        verify(mapper, times(1)).toDTO(medico);
+    }
+
 
 
     @Test
     void deletarMedicoPeloId() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        doNothing().when(validator).validarDelecao(medicoSalvo);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
 
-        // 2. execução
+        // 2.execução
         service.deletarMedicoPeloId(1L);
 
-        // 3.verificação
-
-        verify(medicoRepository, times(1)).findById(1L);
-        verify(medicoRepository, times(1)).delete(medicoSalvo);
+        // 3. verficação
+        verify(validator, times(1)).validarDelecao(medico);
+        verify(medicoRepository, times(1)).delete(medico);
     }
 
     @Test
-    void deletarMedicoPeloIdInexistente() {
+    void deletarMedicoInexistente() {
         // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(medicoRepository).findById(1L);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.deletarMedicoPeloId(1L));
 
-        // 3.verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
-        verify(medicoRepository, times(1)).findById(1L);
-        verify(medicoRepository, times(0)).delete(medicoSalvo);
+        // 3. verficação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe médico com esse ID!");
+        verify(validator, times(0)).validarDelecao(medico);
+        verify(medicoRepository, times(0)).delete(medico);
     }
 
-
     @Test
-    void deletarMedicoPeloIdComConsultasRegistradas() {
+    void deletarMedicoComConsultasRegistradas() {
         // 1.cenário
-        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medicoSalvo));
-        doThrow(DelecaoNaoPermitidaException.class).when(validator).validarDelecao(medicoSalvo);
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+        doThrow(DelecaoNaoPermitidaException.class).when(validator).validarDelecao(medico);
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.deletarMedicoPeloId(1L));
 
-        // 3.verificação
+        // 3. verficação
         assertThat(resultado).isInstanceOf(DelecaoNaoPermitidaException.class);
-        verify(medicoRepository, times(1)).findById(1L);
-        verify(medicoRepository, times(0)).delete(medicoSalvo);
+        verify(validator, times(1)).validarDelecao(medico);
+        verify(medicoRepository, times(0)).delete(medico);
     }
-
-
-    @Test
-    void listarMedicos() {
-    }
-
-
-    private Medico mockMedico() {
-        Medico medico1 = new Medico();
-        medico1.setNome("Dr Robson Santos");
-        medico1.setCrm("crm-23323");
-        medico1.setEmail("robson@email.com");
-        medico1.setTelefone("9999-9999");
-        medico1.setEspecialidade(Especialidade.NEUROLOGISTA);
-        medico1.setDepartamento(new Departamento(1L, "Neurologia", "sexto andar", LocalDateTime.of(2026, 4, 4, 14, 7, 30)));
-
-        return medico1;
-    }
-
-    private Medico mockMedicoSalvo() {
-        Medico medico1 = mockMedico();
-        medico1.setId(1L);
-        return medico1;
-    }
-
-    private MedicoRequest mockRequest() {
-        Especialidade neurologista = Especialidade.NEUROLOGISTA;
-        String crm = "crm-23323";
-        String nome = "Dr Robson Santos";
-        String email = "robson@email.com";
-        String telefone = "9999-9999";
-
-        MedicoRequest request = new MedicoRequest(crm, nome, email, telefone, neurologista, 1L, 1L);
-        return request;
-    }
-
-    private MedicoResponse mockResponse() {
-        Especialidade neurologista = Especialidade.NEUROLOGISTA;
-        String crm = "crm-23323";
-        String nome = "Dr Robson Santos";
-        String email = "robson@email.com";
-        String telefone = "9999-9999";
-
-        MedicoResponse request = new MedicoResponse(1L, crm, nome, email, telefone, neurologista, 1L);
-        return request;
-    }
-
-    private Departamento mockDepartamento() {
-        Departamento departamento1 = new Departamento();
-        departamento1.setId(1L);
-        departamento1.setNome("Cardiologia");
-        departamento1.setLocalizacao("quinto andar");
-
-        return departamento1;
-    }
-
 }

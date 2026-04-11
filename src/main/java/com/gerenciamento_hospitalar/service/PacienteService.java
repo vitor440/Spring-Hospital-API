@@ -58,6 +58,8 @@ public class PacienteService {
         paciente.setTelefone(request.telefone());
         paciente.setTipoSanguineo(request.tipoSanguineo());
         paciente.setDataNascimento(request.dataNascimento());
+        Usuario usuario = getObterUsuarioPeloIdOuLancarExcecao(request.userId());
+        paciente.setUsuario(usuario);
 
         validator.validar(paciente);
         return mapper.toDTO(pacienteRepository.save(paciente));

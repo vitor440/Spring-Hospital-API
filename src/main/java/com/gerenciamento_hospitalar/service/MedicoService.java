@@ -62,8 +62,10 @@ public class MedicoService {
         medico.setEspecialidade(request.especialidade());
 
         Departamento departamento = obterDepartamentoPeloIdOuLancarExcecao(request.departamentoId());
+        Usuario usuario = getObterUsuarioPeloIdOuLancarExcecao(request.userId());
 
         medico.setDepartamento(departamento);
+        medico.setUsuario(usuario);
 
         validator.validar(medico);
         return mapper.toDTO(medicoRepository.save(medico));
@@ -153,7 +155,7 @@ public class MedicoService {
     private Medico obterMedicoLogado(Usuario usuario) {
         Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
 
-        if(!usuario.getRoles().contains("MEDICO") || medicoOpt.isEmpty()) {
+        if(medicoOpt.isEmpty()) {
             throw new AcessoNegadoException("acesso negado.");
         }
 

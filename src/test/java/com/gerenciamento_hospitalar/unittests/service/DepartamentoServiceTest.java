@@ -6,6 +6,7 @@ import com.gerenciamento_hospitalar.exception.DelecaoNaoPermitidaException;
 import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.DepartamentoMapper;
+import com.gerenciamento_hospitalar.mocks.DepartamentoMock;
 import com.gerenciamento_hospitalar.model.Departamento;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.service.DepartamentoService;
@@ -18,8 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,66 +33,70 @@ import static org.mockito.Mockito.*;
 class DepartamentoServiceTest {
 
     @Mock
-    DepartamentoRepository repository;
+    private DepartamentoRepository departamentoRepository;
 
     @Mock
-    DepartamentoValidator validator;
+    private DepartamentoValidator validator;
 
     @Mock
-    DepartamentoMapper mapper;
+    private DepartamentoMapper mapper;
 
     @InjectMocks
-    DepartamentoService service;
+    private DepartamentoService service;
 
-    Departamento departamento;
-    Departamento departamentoSalvo;
-    DepartamentoRequest request;
-    DepartamentoResponse response;
+
+    private DepartamentoRequest request;
+
+    private Departamento departamento;
+
+    private DepartamentoResponse response;
 
     @BeforeEach
     void setUp() {
-        departamento = mockDepartamento();
-        departamentoSalvo = mockDepartamentoSalvo();
-        request = mockRequest();
-        response = mockResponse();
+        request = DepartamentoMock.mockRequest(1);
+        departamento = DepartamentoMock.mockDepartamento(1);
+        response = DepartamentoMock.mockResponse(1);
     }
-
 
     @Test
     void addDepartamento() {
+
         // 1.cenário
+        Departamento departamentoSalvo = departamento;
+        departamentoSalvo.setId(1L);
+
         when(mapper.toEntity(request)).thenReturn(departamento);
-        doNothing().when(validator).validar(departamento);
-        when(repository.save(departamento)).thenReturn(departamentoSalvo);
+        when(departamentoRepository.save(departamento)).thenReturn(departamentoSalvo);
         when(mapper.toDTO(departamentoSalvo)).thenReturn(response);
 
-        // 2. execução
+        // 2.execução
         var resultado = service.addDepartamento(request);
 
-        // 3. verificação
-        assertNotNull(resultado);
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.localizacao(), response.localizacao());
-        assertEquals(resultado.dataCriacao(), response.dataCriacao());
+        // 3.verificação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
 
-        Mockito.verify(repository, times(1)).save(departamento);
-
+        verify(validator, times(1)).validar(departamento);
+        verify(departamentoRepository, times(1)).save(departamento);
     }
 
     @Test
     void addDepartamentoComNomeDuplicado() {
+
         // 1.cenário
+        Departamento departamentoSalvo = departamento;
+        departamentoSalvo.setId(1L);
+
         when(mapper.toEntity(request)).thenReturn(departamento);
         doThrow(RegistroDuplicadoException.class).when(validator).validar(departamento);
 
-        // 2. execução
-        var resultado = catchThrowable(() -> service.addDepartamento(request)) ;
+        // 2.execução
+        var resultado = catchThrowable(() -> service.addDepartamento(request));
 
-        // 3. verificação
+        // 3.verificação
         assertThat(resultado).isInstanceOf(RegistroDuplicadoException.class);
-        Mockito.verify(repository, times(0)).save(departamento);
 
+        verify(validator, times(1)).validar(departamento);
+        verify(departamentoRepository, times(0)).save(departamento);
     }
 
 
@@ -98,173 +105,141 @@ class DepartamentoServiceTest {
     void atualizarDepartamento() {
 
         // 1.cenário
-        when(repository.findById(1L)).thenReturn(Optional.of(departamentoSalvo));
-        doNothing().when(validator).validar(departamentoSalvo);
-        when(repository.save(departamentoSalvo)).thenReturn(departamentoSalvo);
-        when(mapper.toDTO(departamentoSalvo)).thenReturn(response);
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(departamentoRepository.save(departamento)).thenReturn(departamento);
+        when(mapper.toDTO(departamento)).thenReturn(response);
 
-        // 2. execução
+        // 2.execução
         var resultado = service.atualizarDepartamento(1L, request);
 
-        // 3. verificação
-        assertNotNull(resultado);
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.localizacao(), response.localizacao());
-        assertEquals(resultado.dataCriacao(), response.dataCriacao());
+        // 3.verificação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
 
-        Mockito.verify(repository, times(1)).save(departamentoSalvo);
-    }
+        verify(validator, times(1)).validar(departamento);
+        verify(departamentoRepository, times(1)).save(departamento);
 
-    @Test
-    void atualizarDepartamentoComNomeDuplicado() {
-
-        // 1.cenário
-        when(repository.findById(1L)).thenReturn(Optional.of(departamentoSalvo));
-        doThrow(RegistroDuplicadoException.class).when(validator).validar(any());
-
-        // 2. execução
-        var resultado = catchThrowable(() -> service.atualizarDepartamento(1L, request));
-
-        // 3. verificação
-        assertThat(resultado).isInstanceOf(RegistroDuplicadoException.class);
-
-        Mockito.verify(repository, times(0)).save(departamentoSalvo);
     }
 
     @Test
     void atualizarDepartamentoInexistente() {
 
         // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(repository).findById(1L);
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // 2. execução
+        // 2.execução
         var resultado = catchThrowable(() -> service.atualizarDepartamento(1L, request));
 
-        // 3. verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
+        // 3.verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe departamento com esse ID!");
 
-        Mockito.verify(repository, times(0)).save(departamentoSalvo);
+        verify(validator, times(0)).validar(departamento);
+        verify(departamentoRepository, times(0)).save(departamento);
+
+    }
+
+    @Test
+    void atualizarDepartamentoComNomeDuplicado() {
+
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        doThrow(RegistroDuplicadoException.class).when(validator).validar(departamento);
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.atualizarDepartamento(1L, request));
+
+        // 3.verificação
+        assertThat(resultado).isInstanceOf(RegistroDuplicadoException.class);
+
+        verify(validator, times(1)).validar(departamento);
+        verify(departamentoRepository, times(0)).save(departamento);
+
     }
 
 
 
     @Test
     void obterDepartamentoPeloId() {
-        // 1.cenário
-        when(repository.findById(1L)).thenReturn(Optional.of(departamentoSalvo));
-        when(mapper.toDTO(departamentoSalvo)).thenReturn(response);
 
-        // 2. execução
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        when(mapper.toDTO(departamento)).thenReturn(response);
+
+        // 2.execução
         var resultado = service.obterDepartamentoPeloId(1L);
 
-        // 3. verificação
-        assertNotNull(resultado);
-        assertEquals(resultado.id(), response.id());
-        assertEquals(resultado.nome(), response.nome());
-        assertEquals(resultado.localizacao(), response.localizacao());
-        assertEquals(resultado.dataCriacao(), response.dataCriacao());
+        // 3.verificação
+        assertThat(resultado).usingRecursiveComparison().isEqualTo(response);
 
-        Mockito.verify(repository, times(1)).findById(1L);
+        verify(mapper, times(1)).toDTO(departamento);
+
     }
 
     @Test
-    void obterDepartamentoPeloIdInexistente() {
-        // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(repository).findById(1L);
+    void obterDepartamentoInexistente() {
 
-        // 2. execução
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // 2.execução
         var resultado = catchThrowable(() -> service.obterDepartamentoPeloId(1L));
 
-        // 3. verificação
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
+        // 3.verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe departamento com esse ID!");
 
-        Mockito.verify(mapper, times(0)).toDTO(any());
+        verify(mapper, times(0)).toDTO(departamento);
+
     }
 
 
 
     @Test
     void deletarDepartamentoPeloId() {
-        // 1.cenário
-        when(repository.findById(1L)).thenReturn(Optional.of(departamentoSalvo));
-        doNothing().when(validator).validarDelecao(departamentoSalvo);
 
-        // 2. execução
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+
+        // 2.execução
         service.deletarDepartamentoPeloId(1L);
 
-        // 3. verificação
+        // 3.verificação
+        verify(validator, times(1)).validarDelecao(departamento);
+        verify(departamentoRepository, times(1)).delete(departamento);
+    }
 
-        Mockito.verify(repository, times(1)).delete(departamentoSalvo);
+
+    @Test
+    void deletarDepartamentoInexistente() {
+
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // 2.execução
+        var resultado = catchThrowable(() -> service.deletarDepartamentoPeloId(1L));
+
+        // 3.verificação
+        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class).hasMessage("Não existe departamento com esse ID!");
+
+        verify(validator, times(0)).validarDelecao(departamento);
+        verify(departamentoRepository, times(0)).delete(departamento);
     }
 
     @Test
-    void deletarDepartamentoPeloIdComMedicosAssociados() {
-        // 1.cenário
-        when(repository.findById(1L)).thenReturn(Optional.of(departamentoSalvo));
-        doThrow(DelecaoNaoPermitidaException.class).when(validator).validarDelecao(departamentoSalvo);
+    void deletarDepartamentoComMedicosAssociados() {
 
-        // 2. execução
+        // 1.cenário
+        when(departamentoRepository.findById(1L)).thenReturn(Optional.of(departamento));
+        doThrow(DelecaoNaoPermitidaException.class).when(validator).validarDelecao(departamento);
+
+        // 2.execução
         var resultado = catchThrowable(() -> service.deletarDepartamentoPeloId(1L));
 
-        // 3. verificação
-
+        // 3.verificação
         assertThat(resultado).isInstanceOf(DelecaoNaoPermitidaException.class);
-        Mockito.verify(repository, times(0)).delete(departamentoSalvo);
-    }
 
-    @Test
-    void deletarDepartamentoPeloIdInexistente() {
-        // 1.cenário
-        doThrow(RegistroNaoEncontradoException.class).when(repository).findById(1L);
-
-        // 2. execução
-        var resultado = catchThrowable(() -> service.deletarDepartamentoPeloId(1L));
-
-        // 3. verificação
-
-        assertThat(resultado).isInstanceOf(RegistroNaoEncontradoException.class);
-        Mockito.verify(repository, times(0)).delete(departamentoSalvo);
+        verify(validator, times(1)).validarDelecao(departamento);
+        verify(departamentoRepository, times(0)).delete(departamento);
     }
 
 
 
-    @Test
-    void listarDepartamentos() {
-    }
-
-
-
-
-    private Departamento mockDepartamento() {
-        Departamento departamento1 = new Departamento();
-        departamento1.setNome("Cardiologia");
-        departamento1.setLocalizacao("quinto andar");
-
-        return departamento1;
-    }
-
-
-    private Departamento mockDepartamentoSalvo() {
-        Departamento departamento1 = mockDepartamento();
-        departamento1.setId(1L);
-        departamento1.setDataCriacao(LocalDateTime.of(2026, 4, 4, 14, 7, 30));
-
-        return departamento1;
-    }
-
-
-
-
-    private DepartamentoRequest mockRequest() {
-        DepartamentoRequest request1 = new DepartamentoRequest("Cardiologia", "quinto andar");
-        return request1;
-    }
-
-    private DepartamentoResponse mockResponse() {
-        DepartamentoResponse response1 = new DepartamentoResponse(1L, "Cardiologia", "quinto andar",
-                LocalDateTime.of(2026, 4, 4, 14, 7, 30));
-
-        return response1;
-    }
 }
