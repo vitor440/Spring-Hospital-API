@@ -1,29 +1,33 @@
 package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
+import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.file.imports.contract.MedicoImporter;
 import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
+import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
 import com.gerenciamento_hospitalar.mapper.MedicoMapper;
-import com.gerenciamento_hospitalar.model.Departamento;
-import com.gerenciamento_hospitalar.model.Especialidade;
-import com.gerenciamento_hospitalar.model.Medico;
-import com.gerenciamento_hospitalar.model.Usuario;
+import com.gerenciamento_hospitalar.model.*;
+import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import com.gerenciamento_hospitalar.repository.UsuarioRepository;
 import com.gerenciamento_hospitalar.validator.MedicoValidator;
+import jakarta.transaction.Status;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.domain.Sort.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +40,8 @@ public class MedicoService {
     private final MedicoImporterFactory factory;
     private final SecurityService securityService;
     private final UsuarioRepository usuarioRepository;
+    private final ConsultaMapper consultaMapper;
+    private final ConsultaRepository consultaRepository;
 
 
     @Transactional
@@ -104,7 +110,7 @@ public class MedicoService {
 
         Example<Medico> example = Example.of(medico, matcher);
 
-        Sort.Direction sort = direction.equalsIgnoreCase("ASC")? Sort.Direction.ASC: Sort.Direction.DESC;
+        Direction sort = direction.equalsIgnoreCase("ASC")? Direction.ASC: Direction.DESC;
         Pageable pageable = PageRequest.of(pagina, tamanho, sort, "nome");
 
         return medicoRepository.findAll(example, pageable).map(mapper::toDTO);
@@ -135,6 +141,46 @@ public class MedicoService {
     }
 
 
+    @Transactional
+    public Page<ConsultaResponse> obterConsultasPeloIdDoMedico(Long id, StatusConsulta status, int pagina, int tamanho, String direction) {
+        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
+        List<Consulta> consultas;
+
+        if(status == null) {
+            consultas = consultaRepository.obterConsultasPeloIdDoMedico(id);
+        }
+        else {
+            consultas = consultaRepository.obterConsultasPeloIdDoMedicoEPeloStatus(id, status);
+        }
+
+        Direction sort = direction.equalsIgnoreCase("ASC")? Direction.ASC: Direction.DESC;
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "data");
+        Page<Consulta> consultasPage = new PageImpl<>(consultas, pageable, consultas.size());
+
+        return consultasPage.map(consultaMapper::toDTO);
+    }
+
+
+    @Transactional
+    public Page<ConsultaResponse> obterConsultasMedicoLogado(StatusConsulta status, int pagina, int tamanho, String direction) {
+        Usuario usuario = securityService.getUsuarioLogado();
+        Medico medico = obterMedicoLogado(usuario);
+        Long medicoId = medico.getId();
+        List<Consulta> consultas;
+
+        if(status == null) {
+            consultas = consultaRepository.obterConsultasPeloIdDoMedico(medicoId);
+        }
+        else {
+            consultas = consultaRepository.obterConsultasPeloIdDoMedicoEPeloStatus(medicoId, status);
+        }
+
+        Direction sort = direction.equalsIgnoreCase("ASC")? Direction.ASC: Direction.DESC;
+        Pageable pageable = PageRequest.of(pagina, tamanho, sort, "data");
+        Page<Consulta> consultasPage = new PageImpl<>(consultas, pageable, consultas.size());
+
+        return consultasPage.map(consultaMapper::toDTO);
+    }
 
 
     private Medico obterMedicoPeloIdOuLancarExcecao(Long id) {

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSpecificationExecutor<Consulta> {
@@ -27,6 +28,19 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
         AND c.hora BETWEEN :horaInicio AND :horaFim
     """)
     boolean existeConsulta(Medico medico, DiaSemana diaSemana, LocalTime horaInicio, LocalTime horaFim);
+
+    @Query("SELECT c FROM Consulta c WHERE c.medico.id = :id")
+    List<Consulta> obterConsultasPeloIdDoMedico(Long id);
+
+    @Query("SELECT c FROM Consulta c WHERE c.medico.id = :id AND c.status = :status")
+    List<Consulta> obterConsultasPeloIdDoMedicoEPeloStatus(Long id, StatusConsulta status);
+
+    @Query("SELECT c FROM Consulta c WHERE c.paciente.id = :id")
+    List<Consulta> obterConsultaPeloIdDoPaciente(Long id);
+
+
+    @Query("SELECT c FROM Consulta c WHERE c.paciente.id = :id AND c.status = :status")
+    List<Consulta> obterConsultasPeloIdDoPacienteEPeloStatus(Long id, StatusConsulta status);
 
     @Modifying
     @Transactional

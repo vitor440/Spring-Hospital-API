@@ -141,27 +141,4 @@ public interface ConsultaControllerDocs {
     })
     ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id);
 
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasPeloIdDoMedico(@PathVariable("id") Long id);
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoMedico(@PathVariable("id") Long id);
-
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasPeloIdDoPaciente(@PathVariable("id") Long id);
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoPaciente(@PathVariable("id") Long id);
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasMedicoLogado();
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoMedico();
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasPacienteLogado();
-
-
-    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPacienteLogado();
 }

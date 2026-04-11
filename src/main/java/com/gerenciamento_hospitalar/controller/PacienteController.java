@@ -5,6 +5,7 @@ import com.gerenciamento_hospitalar.dto.ErroResposta;
 import com.gerenciamento_hospitalar.dto.request.PacienteRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;
+import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -98,4 +99,29 @@ public class PacienteController implements PacienteControllerDocs {
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(service.importar(file));
     }
+
+    @GetMapping("/{id}/consultas")
+    @PreAuthorize("hasHole('RECEPCIONISTA')")
+    public ResponseEntity<Page<ConsultaResponse>> obterConsultasPeloIdDoPaciente(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "status", required = false) StatusConsulta status,
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
+            @RequestParam(value = "direction",defaultValue = "DESC") String direction) {
+        return ResponseEntity.ok(service.obterConsultasPeloIdDoPaciente(id, status, pagina, tamanho, direction));
+    }
+
+    @GetMapping("/me/consultas")
+    @PreAuthorize("hasHole('RECEPCIONISTA')")
+    public ResponseEntity<Page<ConsultaResponse>> obterConsultasPacienteLogado(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "status", required = false) StatusConsulta status,
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
+            @RequestParam(value = "direction",defaultValue = "DESC") String direction) {
+
+        return ResponseEntity.ok(service.obterConsultasPacienteLogado(status, pagina, tamanho, direction));
+    }
+
+
 }

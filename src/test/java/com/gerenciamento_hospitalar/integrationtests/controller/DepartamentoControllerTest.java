@@ -145,6 +145,7 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Order(4)
     void obterDepartamentoPeloId() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
                 .setBasePath("/departamentos/{id}")
@@ -174,6 +175,7 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Order(5)
     void listarDepartamentos() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
                 .setBasePath("/departamentos")
@@ -210,6 +212,7 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Order(6)
     void deletarDepartamentoPeloId() {
         specification = new RequestSpecBuilder()
                 .setBasePath("/departamentos/{id}")

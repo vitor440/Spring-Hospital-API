@@ -45,31 +45,6 @@ public class TurnoAtendimentoService {
     }
 
 
-    @Transactional
-    public TurnoAtendimentoResponse atualizarDisponibilidadeMedico(Long medicoId,
-                                                                   Long disponibilidadeId,
-                                                                   TurnoAtendimentoRequest request) {
-
-        Medico medico = obterMedicoPorIdOuLancarExcecao(medicoId);
-        List<TurnoAtendimento> disponibilidades = medico.getDisponibilidades();
-
-        Optional<TurnoAtendimento> disponibilidadeOpt = disponibilidades
-                .stream()
-                .filter(disponibilidadeMedico -> disponibilidadeMedico.getId().equals(disponibilidadeId))
-                .findFirst();
-
-        if(disponibilidadeOpt.isPresent()) {
-            TurnoAtendimento disponibilidade = disponibilidadeOpt.get();
-            disponibilidade.setDiaSemana(request.diaSemana());
-            disponibilidade.setHoraInicio(request.horaInicio());
-            disponibilidade.setHoraFim(request.horaFim());
-            validator.validar(disponibilidade);
-            return mapper.toDTO(turnoAtendimentoRepository.save(disponibilidade));
-        }
-
-        throw new RuntimeException("Não existe disponibilidade com esse ID!");
-    }
-
     public TurnoAtendimentoResponse atualizarDisponibilidadeMedico2(Long turnoId, TurnoAtendimentoRequest request) {
 
         TurnoAtendimento turno = obterTurnoPorIdOuLancarExcecao(turnoId);
@@ -79,18 +54,6 @@ public class TurnoAtendimentoService {
         turno.setHoraFim(request.horaFim());
 
         return mapper.toDTO(turnoAtendimentoRepository.save(turno));
-    }
-
-
-
-    public TurnoAtendimentoResponse obterPeloId(Long id) {
-        return mapper.toDTO(obterTurnoPorIdOuLancarExcecao(id));
-    }
-
-    public Page<TurnoAtendimentoResponse> listarDisponibilidades2(int pagina, int tamanho) {
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-
-        return turnoAtendimentoRepository.findAll(pageable).map(mapper::toDTO);
     }
 
     @Transactional
@@ -106,33 +69,6 @@ public class TurnoAtendimentoService {
         }
 
         return disponibilidades.stream().map(mapper::toDTO).toList();
-    }
-
-
-
-    public void deletarPeloId(Long id) {
-        TurnoAtendimento turnoAtendimento = obterTurnoPorIdOuLancarExcecao(id);
-        validator.validarDelecao(turnoAtendimento);
-        turnoAtendimentoRepository.delete(turnoAtendimento);
-    }
-
-    @Transactional
-    public void deletarPeloIdMedico(Long MedicoId, Long disponibilidadeMedicoId) {
-        Medico medico = obterMedicoPorIdOuLancarExcecao(MedicoId);
-        List<TurnoAtendimento> disponibilidades = medico.getDisponibilidades();
-
-        Optional<TurnoAtendimento> disponibilidadeOpt = disponibilidades.stream()
-                        .filter(disponibilidadeMed -> disponibilidadeMed.getId().equals(disponibilidadeMedicoId))
-                        .findFirst();
-
-        if(disponibilidadeOpt.isPresent()) {
-            TurnoAtendimento disponibilidade = disponibilidadeOpt.get();
-            validator.validarDelecao(disponibilidade);
-            turnoAtendimentoRepository.delete(disponibilidade);
-        }
-
-        throw new RuntimeException("Não existe disponibilidade com esse ID!");
-
     }
 
     public void deletarPeloIdMedico2(Long id) {

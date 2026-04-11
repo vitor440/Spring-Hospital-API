@@ -100,18 +100,6 @@ public class ConsultaService {
         return consultas.stream().map(mapper::toDTO).toList();
     }
 
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadasPeloIdDoMedico(Long id) {
-        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-        List<Consulta> consultasAgendadas = medico.getConsultas()
-                .stream()
-                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                .toList();
-
-        if(consultasAgendadas == null || consultasAgendadas.isEmpty()) return List.of();
-
-        return consultasAgendadas.stream().map(mapper::toDTO).toList();
-    }
 
     @Transactional
     public List<ConsultaResponse> obterConsultasPeloIdDoPaciente(Long id) {
@@ -135,27 +123,7 @@ public class ConsultaService {
         return consultas.stream().map(mapper::toDTO).toList();
     }
 
-    @Transactional
-    public List<ConsultaResponse> obterConsultasMedicoLogado() {
-        Usuario usuario = securityService.getUsuarioLogado();
-        Medico medico = obterMedicoPeloUsuario(usuario);
 
-        List<Consulta> consultas = medico.getConsultas();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadasMedicoLogado() {
-        Usuario usuario = securityService.getUsuarioLogado();
-        Medico medico = obterMedicoPeloUsuario(usuario);
-
-        List<Consulta> consultas = medico.getConsultas().stream()
-                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                .toList();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
 
     @Transactional
     public List<ConsultaResponse> obterConsultasPacienteLogado() {

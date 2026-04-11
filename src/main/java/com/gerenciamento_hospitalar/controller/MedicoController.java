@@ -1,14 +1,13 @@
 package com.gerenciamento_hospitalar.controller;
 
 import com.gerenciamento_hospitalar.controller.docs.MedicoControllerDocs;
-import com.gerenciamento_hospitalar.dto.request.TurnoAtendimentoRequest;
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
-import com.gerenciamento_hospitalar.dto.response.TurnoAtendimentoResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.model.Especialidade;
-import com.gerenciamento_hospitalar.service.TurnoAtendimentoService;
+import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.service.MedicoService;
+import com.gerenciamento_hospitalar.service.TurnoAtendimentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +26,6 @@ import java.util.List;
 public class MedicoController implements MedicoControllerDocs {
 
     private final MedicoService service;
-    private final TurnoAtendimentoService turnoAtendimentoService;
 
     @PostMapping
     @Override
@@ -95,4 +93,29 @@ public class MedicoController implements MedicoControllerDocs {
     public ResponseEntity<List<MedicoResponse>> importarDados(@RequestParam("file")MultipartFile file) {
         return ResponseEntity.ok(service.importar(file));
     }
+
+    @GetMapping("/{id}/consultas")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    public ResponseEntity<Page<ConsultaResponse>> obterConsultasPeloIdDoMedico(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "status", required = false) StatusConsulta status,
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
+            @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
+
+        return ResponseEntity.ok(service.obterConsultasPeloIdDoMedico(id, status, pagina, tamanho, direction));
+    }
+
+    @GetMapping("/me/consultas")
+    @PreAuthorize("hasRole('MEDICO')")
+    public ResponseEntity<Page<ConsultaResponse>> obterConsultasMedicoLogado(
+            @RequestParam(value = "status", required = false) StatusConsulta status,
+            @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+            @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,
+            @RequestParam(value = "direction", defaultValue = "DESC") String direction
+    ) {
+        return ResponseEntity.ok(service.obterConsultasMedicoLogado(status, pagina, tamanho, direction));
+    }
+
+
 }

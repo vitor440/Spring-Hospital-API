@@ -75,7 +75,7 @@ class PacienteControllerTest extends AbstractIntegrationTest {
     @Order(2)
     void addPaciente() throws JsonProcessingException {
         request = PacienteMock.mockPacienteRequest(1);
-        RequestSpecification specification = new RequestSpecBuilder()
+        specification = new RequestSpecBuilder()
                 .setBasePath("/pacientes")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
@@ -109,7 +109,7 @@ class PacienteControllerTest extends AbstractIntegrationTest {
     @Order(3)
     void atualizarPaciente() throws JsonProcessingException {
         request = PacienteMock.mockPacienteRequest(2);
-        RequestSpecification specification = new RequestSpecBuilder()
+        specification = new RequestSpecBuilder()
                 .setBasePath("/pacientes/{id}")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
@@ -143,7 +143,7 @@ class PacienteControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(4)
     void obterPacientePeloId() throws JsonProcessingException {
-        RequestSpecification specification = new RequestSpecBuilder()
+        specification = new RequestSpecBuilder()
                 .setBasePath("/pacientes/{id}")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
@@ -174,9 +174,9 @@ class PacienteControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void deletarPacientePeloId() {
-        RequestSpecification specification = new RequestSpecBuilder()
+        specification = new RequestSpecBuilder()
                 .setBasePath("/pacientes/{id}")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
@@ -192,9 +192,9 @@ class PacienteControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     void listarPacientes() throws JsonProcessingException {
-        RequestSpecification specification = new RequestSpecBuilder()
+        specification = new RequestSpecBuilder()
                 .setBasePath("/pacientes")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
@@ -202,7 +202,7 @@ class PacienteControllerTest extends AbstractIntegrationTest {
         var content =  given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenRecepcionista.acessToken())
-                .queryParam("pagina", 0, "tamanho", 5, "direction", "ASC")
+                .queryParams("pagina", 0, "tamanho", 5, "direction", "ASC")
                 .when()
                 .get()
                 .then()
@@ -217,15 +217,16 @@ class PacienteControllerTest extends AbstractIntegrationTest {
 
         PacienteResponse paciente0 = lista.get(0);
 
-        assertEquals(paciente0.cpf(), "455.705.400-59");
-        assertEquals(paciente0.nome(), "lucas pereira de souza");
-        assertEquals(paciente0.genero(), "masculino");
+        assertEquals(paciente0.cpf(), "014.553.780-38");
+        assertEquals(paciente0.nome(), "ana carolina dos santos");
+        assertEquals(paciente0.genero(), "feminino");
 
         PacienteResponse paciente1 = lista.get(1);
 
-        assertEquals(paciente1.cpf(), "014.553.780-38");
-        assertEquals(paciente1.nome(), "ana carolina dos santos");
-        assertEquals(paciente1.genero(), "feminino");
+        assertEquals(paciente1.cpf(), "455.705.400-59");
+        assertEquals(paciente1.nome(), "lucas pereira de souza");
+        assertEquals(paciente1.genero(), "masculino");
+
 
 
     }
