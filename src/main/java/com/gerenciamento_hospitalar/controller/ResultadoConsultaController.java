@@ -17,7 +17,7 @@ public class ResultadoConsultaController {
 
     private final ResultadoConsultaService service;
 
-    @PostMapping("consultas/{id}/resultado")
+    @PostMapping("consultas/{id}/resultadoConsulta")
     @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> gerarResultadoConsulta(@PathVariable("id") Long consultaId, @RequestBody ResultadoConsultaRequest request) {
         ResultadoConsultaResponse response = service.gerarResultadoDaConsulta(request, consultaId);
@@ -30,21 +30,21 @@ public class ResultadoConsultaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping("/prontuarios/{id}")
+    @PutMapping("/resultadoConsulta/{id}")
     @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long id, @RequestBody ResultadoConsultaRequest request) {
 
         return ResponseEntity.ok(service.atualizarResultadoDaConsulta2(id, request));
     }
 
-    @GetMapping("/prontuarios/{id}")
+    @GetMapping("/resultadoConsulta/{id}")
     @PreAuthorize("hasAnyRole('MEDICO', 'RECEPCIONISTA')")
     public ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(service.obterResultadoPeloIdDaConsulta2(id));
     }
 
-    @DeleteMapping("/prontuarios/{id}")
+    @DeleteMapping("/resultadoConsulta/{id}")
     @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long id) {
 

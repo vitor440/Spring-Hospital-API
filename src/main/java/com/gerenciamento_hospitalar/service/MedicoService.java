@@ -1,18 +1,18 @@
 package com.gerenciamento_hospitalar.service;
 
 import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
-import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
 import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.exception.AcessoNegadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.file.imports.contract.MedicoImporter;
 import com.gerenciamento_hospitalar.file.imports.factory.MedicoImporterFactory;
-import com.gerenciamento_hospitalar.mapper.ConsultaMapper;
 import com.gerenciamento_hospitalar.mapper.MedicoMapper;
-import com.gerenciamento_hospitalar.model.*;
+import com.gerenciamento_hospitalar.model.Departamento;
+import com.gerenciamento_hospitalar.model.Especialidade;
+import com.gerenciamento_hospitalar.model.Medico;
+import com.gerenciamento_hospitalar.model.Usuario;
 import com.gerenciamento_hospitalar.repository.DepartamentoRepository;
 import com.gerenciamento_hospitalar.repository.MedicoRepository;
-import com.gerenciamento_hospitalar.repository.RoleRepository;
 import com.gerenciamento_hospitalar.repository.UsuarioRepository;
 import com.gerenciamento_hospitalar.validator.MedicoValidator;
 import jakarta.transaction.Transactional;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +32,6 @@ public class MedicoService {
     private final MedicoRepository medicoRepository;
     private final MedicoValidator validator;
     private final MedicoMapper mapper;
-    private final ConsultaMapper consultaMapper;
     private final DepartamentoRepository departamentoRepository;
     private final MedicoImporterFactory factory;
     private final SecurityService securityService;
@@ -79,17 +77,9 @@ public class MedicoService {
 
     public MedicoResponse obterMedicoLogado() {
         Usuario usuarioLogado = securityService.getUsuarioLogado();
-        if(!usuarioLogado.getRoles().contains("MEDICO")) {
-            throw new AcessoNegadoException("acesso negado.");
-        }
+        Medico medico = obterMedicoLogado(usuarioLogado);
 
-        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
-        if(medicoOpt.isPresent()) {
-            Medico medico = medicoOpt.get();
-            return mapper.toDTO(medico);
-        }
-
-        throw new AcessoNegadoException("acesso negado.");
+        return mapper.toDTO(medico);
     }
 
     public void deletarMedicoPeloId(Long id) {
@@ -118,71 +108,11 @@ public class MedicoService {
         return medicoRepository.findAll(example, pageable).map(mapper::toDTO);
     }
 
-    @Transactional
-    public List<ConsultaResponse> obterConsultas(Long id) {
-        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-
-        List<Consulta> consultas = medico.getConsultas();
-
-        if(consultas == null || consultas.isEmpty()) return List.of();
-
-        return consultas.stream().map(consultaMapper::toDTO).toList();
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasDoMedicoLogado() {
-        Usuario usuarioLogado = securityService.getUsuarioLogado();
-        if(!usuarioLogado.getRoles().contains("MEDICO")) {
-            throw new AcessoNegadoException("acesso negado.");
-        }
-
-        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
-        if(medicoOpt.isPresent()) {
-            Medico medico = medicoOpt.get();
-            List<Consulta> consultas = medico.getConsultas();
-            return consultas.stream().map(consultaMapper::toDTO).toList();
-        }
-
-        throw new AcessoNegadoException("acesso negado.");
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadas(Long id) {
-        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-
-        List<Consulta> consultas = medico.getConsultas().stream()
-                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                .toList();
-
-        if(consultas == null || consultas.isEmpty()) return List.of();
-
-        return consultas.stream().map(consultaMapper::toDTO).toList();
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadasDoMedicoLogado() {
-        Usuario usuarioLogado = securityService.getUsuarioLogado();
-        if(!usuarioLogado.getRoles().contains("MEDICO")) {
-            throw new AcessoNegadoException("acesso negado.");
-        }
-
-        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuarioLogado);
-        if(medicoOpt.isPresent()) {
-            Medico medico = medicoOpt.get();
-            List<Consulta> consultas = medico.getConsultas().stream()
-                    .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                    .toList();;
-            return consultas.stream().map(consultaMapper::toDTO).toList();
-        }
-
-        throw new AcessoNegadoException("acesso negado.");
-    }
-
 
     public List<MedicoResponse> importar(MultipartFile file) {
         String filename = file.getOriginalFilename();
 
-        if(filename.isBlank() || filename == null) {
+        if(filename == null || filename.isBlank()) {
             throw new RuntimeException("Nome do arquivo .csv inválido.");
         }
 
@@ -202,6 +132,9 @@ public class MedicoService {
         }
     }
 
+
+
+
     private Medico obterMedicoPeloIdOuLancarExcecao(Long id) {
         return medicoRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe médico com esse ID!"));
@@ -215,5 +148,15 @@ public class MedicoService {
     private Usuario getObterUsuarioPeloIdOuLancarExcecao(Long userId) {
         return usuarioRepository.findById(userId)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe usuario com esse ID!"));
+    }
+
+    private Medico obterMedicoLogado(Usuario usuario) {
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
+
+        if(!usuario.getRoles().contains("MEDICO") || medicoOpt.isEmpty()) {
+            throw new AcessoNegadoException("acesso negado.");
+        }
+
+        return medicoOpt.get();
     }
 }

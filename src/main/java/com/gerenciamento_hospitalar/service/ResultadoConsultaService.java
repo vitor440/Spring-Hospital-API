@@ -7,7 +7,10 @@ import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.MedicamentoMapper;
 import com.gerenciamento_hospitalar.mapper.ResultadoConsultaMapper;
-import com.gerenciamento_hospitalar.model.*;
+import com.gerenciamento_hospitalar.model.Consulta;
+import com.gerenciamento_hospitalar.model.Medicamento;
+import com.gerenciamento_hospitalar.model.ResultadoConsulta;
+import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.ResultadoConsultaRepository;
 import jakarta.transaction.Transactional;
@@ -129,8 +132,6 @@ public class ResultadoConsultaService {
 
         resultadoConsultaRepository.delete(rs);
     }
-
-
 
 
     public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta(Long consultaId) {

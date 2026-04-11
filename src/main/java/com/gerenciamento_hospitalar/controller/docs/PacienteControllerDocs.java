@@ -99,13 +99,6 @@ public interface PacienteControllerDocs {
     })
     ResponseEntity<Void> deletarPacientePeloId(@PathVariable("id") Long id);
 
-    ResponseEntity<List<ConsultaResponse>> historicoConsultas(@PathVariable("id") Long id);
-
-    ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadas(@PathVariable("id") Long id);
-
-    public ResponseEntity<List<ConsultaResponse>> historicoConsultasPacienteLogado();
-
-    public ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadasPacienteLogado();
 
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file);
 }

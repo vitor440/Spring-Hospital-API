@@ -93,34 +93,6 @@ public class PacienteController implements PacienteControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/consultas")
-    @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    public ResponseEntity<List<ConsultaResponse>> historicoConsultas(Long id) {
-        return ResponseEntity.ok(service.historicoConsultas(id));
-    }
-
-    @GetMapping("/{id}/consultasAgendadas")
-    @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    public ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadas(Long id) {
-        return ResponseEntity.ok(service.listarConsultasAgendadas(id));
-    }
-
-    @GetMapping("/me/consultas")
-    @Override
-    @PreAuthorize("hasAnyRole('PACIENTE')")
-    public ResponseEntity<List<ConsultaResponse>> historicoConsultasPacienteLogado() {
-        return ResponseEntity.ok(service.historicoConsultasPacienteLogado());
-    }
-
-    @GetMapping("/me/consultasAgendadas")
-    @Override
-    @PreAuthorize("hasAnyRole('PACIENTE')")
-    public ResponseEntity<List<ConsultaResponse>> listarConsultasAgendadasPacienteLogado() {
-        return ResponseEntity.ok(service.listarConsultasAgendadasDoPacienteLogado());
-    }
-
     @PostMapping("/importar")
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<List<PacienteResponse>> importar(@RequestParam("file") MultipartFile file) {

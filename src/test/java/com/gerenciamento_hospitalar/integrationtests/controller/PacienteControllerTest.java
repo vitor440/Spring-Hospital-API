@@ -230,9 +230,4 @@ class PacienteControllerTest extends AbstractIntegrationTest {
 
     }
 
-    @Test
-    void historicoConsultas() throws JsonProcessingException {
-
-
-    }
 }

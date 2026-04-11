@@ -2,12 +2,9 @@ package com.gerenciamento_hospitalar.controller;
 
 import com.gerenciamento_hospitalar.controller.docs.ConsultaControllerDocs;
 import com.gerenciamento_hospitalar.dto.request.ConsultaRequest;
-import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ConsultaResponse;
-import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.model.StatusConsulta;
 import com.gerenciamento_hospitalar.service.ConsultaService;
-import com.gerenciamento_hospitalar.service.ResultadoConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,15 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/consultas")
+
 @RequiredArgsConstructor
 public class ConsultaController implements ConsultaControllerDocs {
 
     private final ConsultaService service;
 
-    @PostMapping
+    @PostMapping("/consultas")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> agendarConsulta(@RequestBody @Valid ConsultaRequest request) {
@@ -39,21 +37,21 @@ public class ConsultaController implements ConsultaControllerDocs {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/consultas/{id}")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> atualizarConsulta(@PathVariable("id") Long id, @RequestBody @Valid ConsultaRequest request) {
         return ResponseEntity.ok(service.atualizarConsulta(id, request));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/consultas/{id}")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> obterConsultaPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultaPeloId(id));
     }
 
-    @GetMapping
+    @GetMapping("/consultas")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Page<ConsultaResponse>> listarConsultas(
@@ -66,7 +64,7 @@ public class ConsultaController implements ConsultaControllerDocs {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/consultas/{id}")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> deletarConsultaPeloId(@PathVariable("id") Long id) {
@@ -75,7 +73,7 @@ public class ConsultaController implements ConsultaControllerDocs {
     }
 
 
-    @PatchMapping("/{id}/status/realizar")
+    @PatchMapping("/consultas/{id}/status/realizar")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaRealizada(@PathVariable("id") Long id) {
@@ -83,7 +81,7 @@ public class ConsultaController implements ConsultaControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/status/cancelar")
+    @PatchMapping("/consultas/{id}/status/cancelar")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaCancelada(@PathVariable("id") Long id) {
@@ -91,13 +89,70 @@ public class ConsultaController implements ConsultaControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/status/faltante")
+    @PatchMapping("/consultas/{id}/status/faltante")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id) {
         service.modificaStatusConsulta(id, StatusConsulta.FALTANTE);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/medicos/{id}/consultas")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasPeloIdDoMedico(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.obterConsultasPeloIdDoMedico(id));
+    }
+
+    @GetMapping("/medicos/{id}/consultasAgendadas")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoMedico(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.obterConsultasAgendadasPeloIdDoMedico(id));
+    }
+
+    @GetMapping("/pacientes/{id}/consultas")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasPeloIdDoPaciente(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.obterConsultasPeloIdDoPaciente(id));
+    }
+
+    @GetMapping("/pacientes/{id}/consultasAgendadas")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoPaciente(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.obterConsultasAgendadasPeloIdDoPaciente(id));
+    }
+
+    @GetMapping("/medicos/me/consultas")
+    @PreAuthorize("hasRole('MEDICO')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasMedicoLogado() {
+        return ResponseEntity.ok(service.obterConsultasMedicoLogado());
+    }
+
+    @GetMapping("/medicos/me/consultasAgendadas")
+    @PreAuthorize("hasRole('MEDICO')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPeloIdDoMedico() {
+        return ResponseEntity.ok(service.obterConsultasAgendadasMedicoLogado());
+    }
+
+    @GetMapping("/pacientes/me/consultas")
+    @PreAuthorize("hasRole('PACIENTE')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasPacienteLogado() {
+        return ResponseEntity.ok(service.obterConsultasPacienteLogado());
+    }
+
+    @GetMapping("/pacientes/me/consultasAgendadas")
+    @PreAuthorize("hasRole('PACIENTE')")
+    @Override
+    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasPacienteLogado() {
+        return ResponseEntity.ok(service.obterConsultasAgendadasPacienteLogado());
+    }
+
 
 
 }

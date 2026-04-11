@@ -110,28 +110,5 @@ public interface MedicoControllerDocs {
     ResponseEntity<Void> deletarMedicoPeloId(@PathVariable("id") Long id);
 
 
-
-
-    @Operation(summary = "obter consultas", description = "lista todas as consultas de um médico.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "200",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ConsultaResponse.class)))
-            ),
-            @ApiResponse(description = "médico não encontrado", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id);
-
-    @GetMapping("/me/consultas")
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    ResponseEntity<List<ConsultaResponse>> obterConsultasDoMedicoLogado();
-
-    @GetMapping("/me/consultasAgendadas")
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasDoMedicoLogado();
-
-    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadas(@PathVariable("id") Long id);
-
     public ResponseEntity<List<MedicoResponse>> importarDados(@RequestParam("file") MultipartFile file);
 }

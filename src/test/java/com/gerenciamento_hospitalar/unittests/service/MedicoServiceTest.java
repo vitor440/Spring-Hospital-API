@@ -292,10 +292,6 @@ class MedicoServiceTest {
     void listarMedicos() {
     }
 
-    @Test
-    void obterConsultas() {
-    }
-
 
     private Medico mockMedico() {
         Medico medico1 = new Medico();

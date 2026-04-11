@@ -19,7 +19,7 @@ public class SecurityService {
         var context = SecurityContextHolder.getContext();
 
         if(context == null || context.getAuthentication() == null) {
-            throw new RuntimeException("usuário não autenticado");
+            throw new AcessoNegadoException("usuário não autenticado");
         }
 
         var principal = context.getAuthentication().getPrincipal();
@@ -27,7 +27,7 @@ public class SecurityService {
             return usuario;
         }
 
-        throw new RuntimeException("Usuário não autenticado");
+        throw new AcessoNegadoException("Usuário não autenticado");
     }
 
 

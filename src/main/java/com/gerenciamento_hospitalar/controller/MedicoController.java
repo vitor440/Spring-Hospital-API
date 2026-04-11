@@ -89,34 +89,6 @@ public class MedicoController implements MedicoControllerDocs {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/consultas")
-    @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    public ResponseEntity<List<ConsultaResponse>> obterConsultas(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(service.obterConsultas(id));
-    }
-
-    @GetMapping("/{id}/consultasAgendadas")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadas(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(service.obterConsultasAgendadas(id));
-    }
-
-    @GetMapping("/me/consultas")
-    @PreAuthorize("hasRole('MEDICO')")
-    @Override
-    public ResponseEntity<List<ConsultaResponse>> obterConsultasDoMedicoLogado() {
-        return ResponseEntity.ok(service.obterConsultasDoMedicoLogado());
-    }
-
-    @GetMapping("/me/consultasAgendadas")
-    @PreAuthorize("hasRole('MEDICO')")
-    @Override
-    public ResponseEntity<List<ConsultaResponse>> obterConsultasAgendadasDoMedicoLogado() {
-        return ResponseEntity.ok(service.obterConsultasAgendadasDoMedicoLogado());
-    }
-
 
     @PostMapping("/importar")
     @PreAuthorize("hasRole('ADMIN')")
