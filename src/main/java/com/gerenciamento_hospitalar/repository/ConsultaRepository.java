@@ -29,11 +29,22 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
     """)
     boolean existeConsulta(Medico medico, DiaSemana diaSemana, LocalTime horaInicio, LocalTime horaFim);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Consulta c SET c.status = :status WHERE c.id = :id")
+    void modificaStatusConsulta(@Param("id") Long id, @Param("status") StatusConsulta status);
+
+
+
+    // === BUSCAS POR MÉDICOS ===
+
     @Query("SELECT c FROM Consulta c WHERE c.medico.id = :id")
     List<Consulta> obterConsultasPeloIdDoMedico(Long id);
 
     @Query("SELECT c FROM Consulta c WHERE c.medico.id = :id AND c.status = :status")
     List<Consulta> obterConsultasPeloIdDoMedicoEPeloStatus(Long id, StatusConsulta status);
+
+    // === BUSCAS POR PACIENTES ===
 
     @Query("SELECT c FROM Consulta c WHERE c.paciente.id = :id")
     List<Consulta> obterConsultaPeloIdDoPaciente(Long id);
@@ -42,8 +53,4 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
     @Query("SELECT c FROM Consulta c WHERE c.paciente.id = :id AND c.status = :status")
     List<Consulta> obterConsultasPeloIdDoPacienteEPeloStatus(Long id, StatusConsulta status);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Consulta c SET c.status = :status WHERE c.id = :id")
-    void modificaStatusConsulta(@Param("id") Long id, @Param("status") StatusConsulta status);
 }

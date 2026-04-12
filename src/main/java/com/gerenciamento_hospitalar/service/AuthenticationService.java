@@ -3,6 +3,7 @@ package com.gerenciamento_hospitalar.service;
 import com.gerenciamento_hospitalar.dto.security.CadastroUsuarioDTO;
 import com.gerenciamento_hospitalar.dto.security.RoleDTO;
 import com.gerenciamento_hospitalar.dto.security.TokenDTO;
+import com.gerenciamento_hospitalar.exception.RegistroDuplicadoException;
 import com.gerenciamento_hospitalar.exception.RegistroNaoEncontradoException;
 import com.gerenciamento_hospitalar.mapper.UsuarioMapper;
 import com.gerenciamento_hospitalar.model.Role;
@@ -36,7 +37,7 @@ public class AuthenticationService {
                 request.senha()
         ));
 
-        var user = repository.findByUsername(request.username());
+        Optional<Usuario> user = repository.findByUsername(request.username());
 
         if(user.isEmpty()) {
             throw new UsernameNotFoundException("Username not found!");
@@ -75,6 +76,10 @@ public class AuthenticationService {
         usuario.setCredentialsNonExpired(true);
         usuario.setEnabled(true);
 
+        if(repository.existsByUsername(usuario.getUsername())) {
+            throw new RegistroDuplicadoException("Já existe um usuário com o username: " + usuario.getUsername());
+        }
+
         return mapper.toDTO(repository.save(usuario));
     }
 
@@ -86,6 +91,9 @@ public class AuthenticationService {
             Optional<Role> roleOpt = roleRepository.findByRole(role);
 
             if(roleOpt.isPresent()) {
+                if(usuario.getRoles().contains(roleOpt.get().getRole())) {
+                    throw new RegistroDuplicadoException("esse usuário já possui a role " + roleOpt.get().getRole());
+                }
                 usuario.getPermissions().add(roleOpt.get());
             }
             else {

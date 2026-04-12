@@ -1,6 +1,6 @@
 package com.gerenciamento_hospitalar.validator;
 
-import com.gerenciamento_hospitalar.exception.ConsultasConflitantesException;
+import com.gerenciamento_hospitalar.exception.HorariosConflitantesException;
 import com.gerenciamento_hospitalar.exception.HoraForaDoPadraoException;
 import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
@@ -19,7 +19,7 @@ public class ConsultaValidator {
 
     public void validar(Consulta consulta) {
         if(datasConflitantes(consulta)) {
-            throw new ConsultasConflitantesException("Já existe consulta nessa data e horario!");
+            throw new HorariosConflitantesException("Já existe consulta nessa data e horario!");
         }
 
         if(horarioForaDoPadrao(consulta)) {
@@ -27,7 +27,7 @@ public class ConsultaValidator {
         }
 
         if(!medicoIndisponivel(consulta)) {
-            throw new ConsultasConflitantesException("Médico não disponível!");
+            throw new HorariosConflitantesException("Médico não disponível!");
         }
     }
 

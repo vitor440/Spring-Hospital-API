@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SecurityService {
 
-    private final UsuarioRepository repository;
 
     public Usuario getUsuarioLogado() {
         var context = SecurityContextHolder.getContext();

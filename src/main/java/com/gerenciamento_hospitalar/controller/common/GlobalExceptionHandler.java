@@ -41,9 +41,9 @@ public class GlobalExceptionHandler {
         return new ErroResposta(e.getMessage(), HttpStatus.CONFLICT.value(), List.of());
     }
 
-    @ExceptionHandler(ConsultasConflitantesException.class)
+    @ExceptionHandler(HorariosConflitantesException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErroResposta ConsultasConflitantesExceptionHandle(ConsultasConflitantesException e) {
+    public ErroResposta ConsultasConflitantesExceptionHandle(HorariosConflitantesException e) {
         return new ErroResposta(e.getMessage(), HttpStatus.CONFLICT.value(), List.of());
     }
 

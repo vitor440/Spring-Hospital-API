@@ -36,7 +36,7 @@ public class TurnoController {
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<TurnoAtendimentoResponse> atualizarTurnoMedico(@PathVariable("id") Long id,
                                                                          @RequestBody TurnoAtendimentoRequest request) {
-        return ResponseEntity.ok(service.atualizarDisponibilidadeMedico2(id, request));
+        return ResponseEntity.ok(service.atualizarDisponibilidadeMedico(id, request));
     }
 
     @GetMapping("medicos/{id}/turnos-atendimento")
@@ -47,13 +47,13 @@ public class TurnoController {
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho
     ) {
 
-        return ResponseEntity.ok(service.listarDisponibilidades(id, pagina, tamanho));
+        return ResponseEntity.ok(service.obterTurnosDeMedicoPeloId(id, pagina, tamanho));
     }
 
     @DeleteMapping("/turnos/{id}")
     @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<TurnoAtendimentoResponse> deletarTurnoPeloIdMedico(@PathVariable("id") Long id) {
-        service.deletarPeloIdMedico2(id);
+        service.deletarTurnoPeloId(id);
         return ResponseEntity.noContent().build();
     }
 

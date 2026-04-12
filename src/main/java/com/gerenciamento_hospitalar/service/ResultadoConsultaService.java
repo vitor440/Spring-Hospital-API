@@ -46,8 +46,10 @@ public class ResultadoConsultaService {
             rs.getPrescricao().setMedicoId(consulta.getMedico().getId());
             rs.getPrescricao().setPacienteId(consulta.getPaciente().getId());
 
-            for (Medicamento medicamento : rs.getPrescricao().getMedicamentos()) {
-                medicamento.setPrescricao(rs.getPrescricao());
+            if(rs.getPrescricao().getMedicamentos() != null) {
+                for (Medicamento medicamento : rs.getPrescricao().getMedicamentos()) {
+                    medicamento.setPrescricao(rs.getPrescricao());
+                }
             }
         }
 
@@ -57,37 +59,7 @@ public class ResultadoConsultaService {
 
 
 
-
-    public ResultadoConsultaResponse atualizarResultadoDaConsulta(Long consultaId, ResultadoConsultaRequest request) {
-        Consulta consulta =obterConsultaPeloIdOuLancarExcecao(consultaId);
-
-        if(consulta.getResultadoConsulta() == null) {
-            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
-        }
-
-        ResultadoConsulta rs = consulta.getResultadoConsulta();
-        rs.setSintomas(request.sintomas());
-        rs.setNotas(request.notas());
-        rs.setTratamento(request.tratamento());
-        rs.setDataRetorno(request.dataRetorno());
-        rs.setDiagnostico(request.diagnostico());
-
-        if(rs.getPrescricao() != null) {
-            rs.getPrescricao().setComentarios(request.prescricao().comentarios());
-            rs.getPrescricao().setDataPrescricao(request.prescricao().dataPrescricao());
-
-            rs.getPrescricao().getMedicamentos().clear();
-
-            for (MedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
-                Medicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
-                medicamento.setPrescricao(rs.getPrescricao());
-                rs.getPrescricao().getMedicamentos().add(medicamento);
-            }
-        }
-        return mapper.toDTO(resultadoConsultaRepository.save(rs));
-    }
-
-    public ResultadoConsultaResponse atualizarResultadoDaConsulta2(Long id, ResultadoConsultaRequest request) {
+    public ResultadoConsultaResponse atualizarResultadoDaConsulta(Long id, ResultadoConsultaRequest request) {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
 
         rs.setSintomas(request.sintomas());
@@ -100,36 +72,23 @@ public class ResultadoConsultaService {
             rs.getPrescricao().setComentarios(request.prescricao().comentarios());
             rs.getPrescricao().setDataPrescricao(request.prescricao().dataPrescricao());
 
-            rs.getPrescricao().getMedicamentos().clear();
 
-            for (MedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
-                Medicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
-                medicamento.setPrescricao(rs.getPrescricao());
-                rs.getPrescricao().getMedicamentos().add(medicamento);
+            if(rs.getPrescricao().getMedicamentos() != null) {
+                rs.getPrescricao().getMedicamentos().clear();
+
+                for (MedicamentoRequest medicamentoRequest : request.prescricao().medicamentos()) {
+                    Medicamento medicamento = medicamentoMapper.toEntity(medicamentoRequest);
+                    medicamento.setPrescricao(rs.getPrescricao());
+                    rs.getPrescricao().getMedicamentos().add(medicamento);
+                }
             }
         }
         return mapper.toDTO(resultadoConsultaRepository.save(rs));
     }
 
 
-
-    public void deletarResultadoDaConsulta(Long consultaId) {
-        Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
-
-        if(consulta.getResultadoConsulta() == null) {
-            throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
-        }
-
-        ResultadoConsulta resultadoConsulta = consulta.getResultadoConsulta();
-        consulta.setResultadoConsulta(null);
-        consulta.setPrescricao(null);
-        resultadoConsulta.setConsulta(null);
-        resultadoConsultaRepository.delete(resultadoConsulta);
-    }
-
-    public void deletarResultadoDaConsulta2(Long id) {
+    public void deletarResultadoDaConsulta(Long id) {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
-
         resultadoConsultaRepository.delete(rs);
     }
 
@@ -144,7 +103,7 @@ public class ResultadoConsultaService {
         return mapper.toDTO(consulta.getResultadoConsulta());
     }
 
-    public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta2(Long id) {
+    public ResultadoConsultaResponse obterResultadoPeloId(Long id) {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
         return mapper.toDTO(rs);
     }
@@ -158,6 +117,6 @@ public class ResultadoConsultaService {
 
     private ResultadoConsulta obterResultadoConsultaPeloIdOuLancarExcecao(Long id) {
         return resultadoConsultaRepository.findById(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe consulta com esse ID!"));
+                .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe resultado de consulta com esse ID!"));
     }
 }

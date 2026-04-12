@@ -34,21 +34,21 @@ public class ResultadoConsultaController {
     @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> atualizarResultadoConsulta(@PathVariable("id") Long id, @RequestBody ResultadoConsultaRequest request) {
 
-        return ResponseEntity.ok(service.atualizarResultadoDaConsulta2(id, request));
+        return ResponseEntity.ok(service.atualizarResultadoDaConsulta(id, request));
     }
 
     @GetMapping("/resultadoConsulta/{id}")
     @PreAuthorize("hasAnyRole('MEDICO', 'RECEPCIONISTA')")
     public ResponseEntity<ResultadoConsultaResponse> obterResultadoConsulta(@PathVariable("id") Long id) {
 
-        return ResponseEntity.ok(service.obterResultadoPeloIdDaConsulta2(id));
+        return ResponseEntity.ok(service.obterResultadoPeloId(id));
     }
 
     @DeleteMapping("/resultadoConsulta/{id}")
     @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<ResultadoConsultaResponse> deletarResultadoConsulta(@PathVariable("id") Long id) {
 
-        service.deletarResultadoDaConsulta2(id);
+        service.deletarResultadoDaConsulta(id);
         return ResponseEntity.noContent().build();
     }
 }

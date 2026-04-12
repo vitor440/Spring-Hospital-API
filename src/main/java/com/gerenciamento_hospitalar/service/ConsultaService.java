@@ -67,6 +67,10 @@ public class ConsultaService {
         return mapper.toDTO(consultaRepository.save(consulta));
     }
 
+    public ConsultaResponse obterConsultaPeloId(Long id) {
+        return mapper.toDTO(obterConsultaPeloIdOuLancarExcecao(id));
+    }
+
     public Page<ConsultaResponse> listarConsultas(int pagina, int tamanho, String direction) {
 
         var sort = direction.equalsIgnoreCase("asc") ? Direction.ASC : Direction.DESC;
@@ -77,10 +81,6 @@ public class ConsultaService {
     }
 
 
-    public ConsultaResponse obterConsultaPeloId(Long id) {
-        return mapper.toDTO(obterConsultaPeloIdOuLancarExcecao(id));
-    }
-
     public void modificaStatusConsulta(Long id, StatusConsulta status) {
         obterConsultaPeloIdOuLancarExcecao(id);
         consultaRepository.modificaStatusConsulta(id, status);
@@ -90,62 +90,8 @@ public class ConsultaService {
         consultaRepository.delete(obterConsultaPeloIdOuLancarExcecao(id));
     }
 
-    @Transactional
-    public List<ConsultaResponse> obterConsultasPeloIdDoMedico(Long id) {
-        Medico medico = obterMedicoPeloIdOuLancarExcecao(id);
-        List<Consulta> consultas = medico.getConsultas();
-
-        if(consultas == null || consultas.isEmpty()) return List.of();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
 
 
-    @Transactional
-    public List<ConsultaResponse> obterConsultasPeloIdDoPaciente(Long id) {
-        Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-        List<Consulta> consultas = paciente.getConsultas();
-
-        if(consultas == null || consultas.isEmpty()) return List.of();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadasPeloIdDoPaciente(Long id) {
-        Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-        List<Consulta> consultas = paciente.getConsultas().stream()
-                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                .toList();
-
-        if(consultas == null || consultas.isEmpty()) return List.of();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
-
-
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasPacienteLogado() {
-        Usuario usuario = securityService.getUsuarioLogado();
-        Paciente paciente = obterPacientePeloUsuario(usuario);
-
-        List<Consulta> consultas = paciente.getConsultas();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
-
-    @Transactional
-    public List<ConsultaResponse> obterConsultasAgendadasPacienteLogado() {
-        Usuario usuario = securityService.getUsuarioLogado();
-        Paciente paciente = obterPacientePeloUsuario(usuario);
-
-        List<Consulta> consultas = paciente.getConsultas().stream()
-                .filter(consulta -> consulta.getStatus() == StatusConsulta.AGENDADA)
-                .toList();
-
-        return consultas.stream().map(mapper::toDTO).toList();
-    }
 
 
 
@@ -165,25 +111,7 @@ public class ConsultaService {
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe consulta com esse ID!"));
     }
 
-    private Medico obterMedicoPeloUsuario(Usuario usuario) {
-        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
 
-        if(!usuario.getRoles().contains("MEDICO") || medicoOpt.isEmpty()) {
-            throw new AcessoNegadoException("Acesso negado!");
-        }
-
-        return medicoOpt.get();
-    }
-
-    private Paciente obterPacientePeloUsuario(Usuario usuario) {
-        Optional<Paciente> pacienteOpt = pacienteRepository.findByUsuario(usuario);
-
-        if(!usuario.getRoles().contains("PACIENTE") || pacienteOpt.isEmpty()) {
-            throw new AcessoNegadoException("Acesso negado!");
-        }
-
-        return pacienteOpt.get();
-    }
 }
 
 

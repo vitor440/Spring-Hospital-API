@@ -143,8 +143,8 @@ public class PacienteService {
     public Page<ConsultaResponse> obterConsultasPeloIdDoPaciente(Long id, StatusConsulta status,
                                                                  int pagina, int tamanho, String direction) {
         Paciente paciente = obterPacientePeloIdOuLancarExcecao(id);
-
         List<Consulta> consultas;
+
         if(status == null) {
             consultas = consultaRepository.obterConsultaPeloIdDoPaciente(id);
         }
@@ -164,8 +164,8 @@ public class PacienteService {
         Usuario usuario = securityService.getUsuarioLogado();
         Paciente paciente = obterPacienteLogado(usuario);
         Long pacienteId = paciente.getId();
-
         List<Consulta> consultas;
+
         if(status == null) {
             consultas = consultaRepository.obterConsultaPeloIdDoPaciente(pacienteId);
         }
@@ -179,6 +179,11 @@ public class PacienteService {
 
         return consultasPage.map(consultaMapper::toDTO);
     }
+
+
+
+
+
 
     private Paciente obterPacientePeloIdOuLancarExcecao(Long id) {
         return pacienteRepository.findById(id)

@@ -13,10 +13,8 @@ import com.gerenciamento_hospitalar.repository.MedicoRepository;
 import com.gerenciamento_hospitalar.validator.TurnoAtendimentoValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class TurnoAtendimentoService {
     }
 
 
-    public TurnoAtendimentoResponse atualizarDisponibilidadeMedico2(Long turnoId, TurnoAtendimentoRequest request) {
+    public TurnoAtendimentoResponse atualizarDisponibilidadeMedico(Long turnoId, TurnoAtendimentoRequest request) {
 
         TurnoAtendimento turno = obterTurnoPorIdOuLancarExcecao(turnoId);
 
@@ -53,11 +51,12 @@ public class TurnoAtendimentoService {
         turno.setHoraInicio(request.horaInicio());
         turno.setHoraFim(request.horaFim());
 
+        validator.validar(turno);
         return mapper.toDTO(turnoAtendimentoRepository.save(turno));
     }
 
     @Transactional
-    public List<TurnoAtendimentoResponse> listarDisponibilidades(Long id, int pagina, int tamanho) {
+    public List<TurnoAtendimentoResponse> obterTurnosDeMedicoPeloId(Long id, int pagina, int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
 
         Medico medico = obterMedicoPorIdOuLancarExcecao(id);
@@ -71,7 +70,7 @@ public class TurnoAtendimentoService {
         return disponibilidades.stream().map(mapper::toDTO).toList();
     }
 
-    public void deletarPeloIdMedico2(Long id) {
+    public void deletarTurnoPeloId(Long id) {
         TurnoAtendimento turno = obterTurnoPorIdOuLancarExcecao(id);
         validator.validarDelecao(turno);
         turnoAtendimentoRepository.delete(turno);
