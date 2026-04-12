@@ -67,7 +67,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
 
         usuarioSalvo = objectMapper.readValue(content, CadastroUsuarioDTO.class);
-        assertEquals(usuarioSalvo.username(), "admin");
+        assertEquals(usuarioSalvo.username(), "admin2");
     }
 
     @Test
@@ -93,7 +93,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
         assertNotNull(tokenDTO.acessToken());
         assertNotNull(tokenDTO.refreshToken());
 
-        assertEquals(tokenDTO.username(), "admin");
+        assertEquals(tokenDTO.username(), "admin2");
         assertTrue(tokenDTO.authenticated());
     }
 
@@ -130,7 +130,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
     @Order(4)
     void criaRole() throws JsonProcessingException {
         Role role = new Role();
-        role.setRole("ADMIN");
+        role.setRole("ADMIN2");
 
         RequestSpecification specification = new RequestSpecBuilder()
                 .setBasePath("auth/createRoles")
@@ -151,7 +151,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
         Role roleSalvo = objectMapper.readValue(content, Role.class);
 
         assertNotNull(roleSalvo.getId());
-        assertEquals(roleSalvo.getRole(), "ADMIN");
+        assertEquals(roleSalvo.getRole(), "ADMIN2");
 
     }
 
@@ -166,7 +166,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .pathParams("userId", usuarioSalvo.id())
-                .body(new RoleDTO(List.of("ADMIN")))
+                .body(new RoleDTO(List.of("ADMIN2")))
                 .when()
                 .post()
                 .then()
@@ -177,7 +177,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
 
     private static CadastroUsuarioDTO mockUsuarioDTO() {
-        CadastroUsuarioDTO usuarioDTO1 = new CadastroUsuarioDTO(null, "admin", "admin123", "admin");
+        CadastroUsuarioDTO usuarioDTO1 = new CadastroUsuarioDTO(null, "admin2", "admin123", "admin2");
         return usuarioDTO1;
     }
 }

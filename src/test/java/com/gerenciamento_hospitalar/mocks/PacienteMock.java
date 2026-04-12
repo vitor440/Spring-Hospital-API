@@ -11,8 +11,8 @@ public class PacienteMock {
     public static Paciente mockPaciente(int i) {
         Paciente paciente = new Paciente();
         paciente.setCpf("449.815.530-05");
-        paciente.setNome("paciente1");
-        paciente.setEmail("paciente@email.com" + i);
+        paciente.setNome("paciente" + i);
+        paciente.setEmail("Email" + i);
         paciente.setEndereco("endereço" + i);
         paciente.setGenero(i % 2 == 0? "feminino": "masculino");
         paciente.setTelefone("Telefone" + i);
@@ -33,7 +33,7 @@ public class PacienteMock {
     public static PacienteRequest mockPacienteRequest(int i) {
         String cpf = "449.815.530-05";
         String nome = "paciente" + i;
-        String email = "paciente@email.com" + i;
+        String email = "Email" + i;
         String genero = i % 2 == 0? "feminino": "masculino";
         String telefone = "Telefone" + i;
         String tipoSanguineo = i % 2 == 0? "O+": "O-";
@@ -48,7 +48,7 @@ public class PacienteMock {
     public static PacienteResponse mockPacienteResponse(int i) {
         String cpf = "449.815.530-05";
         String nome = "paciente" + i;
-        String email = "paciente@email.com" + i;
+        String email = "Email" + i;
         String genero = i % 2 == 0? "feminino": "masculino";
         String telefone = "Telefone" + i;
         String tipoSanguineo = i % 2 == 0? "O+": "O-";

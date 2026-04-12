@@ -1,4 +1,4 @@
-package com.gerenciamento_hospitalar.integrationtests.dto;
+package com.gerenciamento_hospitalar.integrationtests.pageContent;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciamento_hospitalar.dto.response.PacienteResponse;

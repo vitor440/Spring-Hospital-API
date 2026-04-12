@@ -73,27 +73,11 @@ public class ConsultaController implements ConsultaControllerDocs {
     }
 
 
-    @PatchMapping("/consultas/{id}/status/realizar")
+    @PatchMapping("/consultas/{id}/status")
     @Override
     @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<Void> AlterarStatusConsultaParaRealizada(@PathVariable("id") Long id) {
-        service.modificaStatusConsulta(id, StatusConsulta.REALIZADA);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/consultas/{id}/status/cancelar")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<Void> AlterarStatusConsultaParaCancelada(@PathVariable("id") Long id) {
-        service.modificaStatusConsulta(id, StatusConsulta.CANCELADA);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/consultas/{id}/status/faltante")
-    @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
-    public ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id) {
-        service.modificaStatusConsulta(id, StatusConsulta.FALTANTE);
+    public ResponseEntity<Void> AlterarStatusConsulta(@PathVariable("id") Long id, @RequestParam(value = "status") StatusConsulta status) {
+        service.modificaStatusConsulta(id, status);
         return ResponseEntity.noContent().build();
     }
 

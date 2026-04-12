@@ -102,7 +102,7 @@ public interface ConsultaControllerDocs {
 
 
 
-    @Operation(summary = "alterar status da consulta", description = "altera o status de uma consulta para REALIZADA.")
+    @Operation(summary = "alterar status da consulta", description = "altera o status de uma consulta para REALIZADA, CANCELADA ou FALTANTE.")
     @ApiResponses({
             @ApiResponse(description = "Sucesso", responseCode = "204",
                     content = @Content
@@ -111,34 +111,9 @@ public interface ConsultaControllerDocs {
                     content = @Content(schema = @Schema(implementation = ErroResposta.class))
             )
     })
-    ResponseEntity<Void> AlterarStatusConsultaParaRealizada(@PathVariable("id") Long id);
+    ResponseEntity<Void> AlterarStatusConsulta(@PathVariable("id") Long id, @RequestParam(value = "status") StatusConsulta status);
 
 
 
-
-    @Operation(summary = "alterar status da consulta", description = "altera o status de uma consulta para CANCELADA.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "204",
-                    content = @Content
-            ),
-            @ApiResponse(description = "consulta não encontrada", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<Void> AlterarStatusConsultaParaCancelada(@PathVariable("id") Long id);
-
-
-
-
-    @Operation(summary = "alterar status da consulta", description = "altera o status de uma consulta para FALTANTE.")
-    @ApiResponses({
-            @ApiResponse(description = "Sucesso", responseCode = "204",
-                    content = @Content
-            ),
-            @ApiResponse(description = "consulta não encontrada", responseCode = "404",
-                    content = @Content(schema = @Schema(implementation = ErroResposta.class))
-            )
-    })
-    ResponseEntity<Void> AlterarStatusConsultaParaFaltante(@PathVariable("id") Long id);
 
 }

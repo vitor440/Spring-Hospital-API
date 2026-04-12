@@ -9,9 +9,9 @@ public class MedicoMock {
 
     public static Medico mockMedico(int i) {
         Medico medico1 = new Medico();
-        medico1.setNome("Dr Robson Santos" + i);
+        medico1.setNome("Nome" + i);
         medico1.setCrm("crm-" + i);
-        medico1.setEmail("robson@email.com" + i);
+        medico1.setEmail("Email" + i);
         medico1.setTelefone("Telefone" + i);
         medico1.setEspecialidade(i % 2 == 0? Especialidade.NEUROLOGISTA: Especialidade.CARDIOLOGISTA);
         medico1.setDepartamento(DepartamentoMock.mockDepartamento(i));
@@ -29,8 +29,8 @@ public class MedicoMock {
     public static MedicoRequest mockRequest(int i) {
         Especialidade neurologista = i % 2 == 0? Especialidade.NEUROLOGISTA: Especialidade.CARDIOLOGISTA;
         String crm = "crm-" + i;
-        String nome = "Dr Robson Santos" + i;
-        String email = "robson@email.com" + i;
+        String nome = "Nome" + i;
+        String email = "Email" + i;
         String telefone = "Telefone" + i;
 
         MedicoRequest request = new MedicoRequest(crm, nome, email, telefone, neurologista, 1L, 1L);
@@ -40,8 +40,8 @@ public class MedicoMock {
     public static MedicoResponse mockResponse(int i) {
         Especialidade neurologista = i % 2 == 0? Especialidade.NEUROLOGISTA: Especialidade.CARDIOLOGISTA;
         String crm = "crm-" + i;
-        String nome = "Dr Robson Santos" + i;
-        String email = "robson@email.com" + i;
+        String nome = "Nome" + i;
+        String email = "Email" + i;
         String telefone = "Telefone" + i;
 
         MedicoResponse request = new MedicoResponse(1L, crm, nome, email, telefone, neurologista, 1L);

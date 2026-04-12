@@ -9,13 +9,11 @@ import com.gerenciamento_hospitalar.dto.response.DepartamentoResponse;
 import com.gerenciamento_hospitalar.dto.security.CadastroUsuarioDTO;
 import com.gerenciamento_hospitalar.dto.security.TokenDTO;
 import com.gerenciamento_hospitalar.integrationtests.AbstractIntegrationTest;
-import com.gerenciamento_hospitalar.integrationtests.dto.DepartamentoPageContent;
+import com.gerenciamento_hospitalar.integrationtests.pageContent.DepartamentoPageContent;
 import com.gerenciamento_hospitalar.model.Departamento;
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
-import org.junit.runner.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -176,6 +174,24 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(5)
+    void deletarDepartamentoPeloId() {
+        specification = new RequestSpecBuilder()
+                .setBasePath("/departamentos/{id}")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
+                .pathParam("id", response.id())
+                .when()
+                .delete()
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    @Order(6)
     void listarDepartamentos() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
                 .setBasePath("/departamentos")
@@ -209,24 +225,6 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
         assertEquals(departamento3.localizacao(), "terceiro andar");
 
 
-    }
-
-    @Test
-    @Order(6)
-    void deletarDepartamentoPeloId() {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/departamentos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
-        var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
-                .pathParam("id", response.id())
-                .when()
-                .delete()
-                .then()
-                .statusCode(204);
     }
 
     private static Departamento mockDepartamento() {

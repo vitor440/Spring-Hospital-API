@@ -95,7 +95,7 @@ public class MedicoController implements MedicoControllerDocs {
     }
 
     @GetMapping("/{id}/consultas")
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<ConsultaResponse>> obterConsultasPeloIdDoMedico(
             @PathVariable("id") Long id,
             @RequestParam(value = "status", required = false) StatusConsulta status,

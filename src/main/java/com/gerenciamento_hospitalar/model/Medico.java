@@ -36,7 +36,7 @@ public class Medico {
     @JoinColumn(name = "departamento_id")
     private Departamento departamento;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private Usuario usuario;
 
