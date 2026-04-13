@@ -63,7 +63,6 @@ public class ResultadoConsultaService {
 
     public ResultadoConsultaResponse atualizarResultadoDaConsulta(Long id, ResultadoConsultaRequest request) {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
-
         Usuario usuario = securityService.getUsuarioLogado();
         Medico medico = rs.getConsulta().getMedico();
 
@@ -138,7 +137,7 @@ public class ResultadoConsultaService {
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe resultado de consulta com esse ID!"));
     }
 
-    private static void validaSeUsuarioTemPermissaoParaGerenciarResultado(Medico medico, Usuario usuario) {
+    private void validaSeUsuarioTemPermissaoParaGerenciarResultado(Medico medico, Usuario usuario) {
         if(!medico.getUsuario().getId().equals(usuario.getId())) {
             throw new AcessoNegadoException("médico não autorizado!");
         }

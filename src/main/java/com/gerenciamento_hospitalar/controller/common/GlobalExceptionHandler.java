@@ -61,16 +61,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AcessoNegadoException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErroResposta AcessoNegadoExceptionHandle(AcessoNegadoException e) {
+        return new ErroResposta(e.getMessage(), HttpStatus.FORBIDDEN.value(), List.of());
+    }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErroResposta InvalidJwtAuthenticationExceptionHandle(InvalidJwtAuthenticationException e) {
         return new ErroResposta(e.getMessage(), HttpStatus.FORBIDDEN.value(), List.of());
     }
 
+
+
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErroResposta InvalidJwtAuthenticationExceptionHandle(Exception e) {
+    public ErroResposta GenericExceptionHandle(Exception e) {
         return new ErroResposta(e.getMessage(), HttpStatus.BAD_REQUEST.value(), List.of());
     }
-
-
-
 }
