@@ -27,13 +27,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/departamentos")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+
 public class DepartamentoController implements DepartamentoControllerDocs {
 
     private final DepartamentoService service;
 
     @PostMapping
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartamentoResponse> addDepartamento(@RequestBody @Valid DepartamentoRequest request) {
         DepartamentoResponse response = service.addDepartamento(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -46,6 +47,7 @@ public class DepartamentoController implements DepartamentoControllerDocs {
 
     @PutMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartamentoResponse> atualizarDepartamento(@PathVariable("id") Long id,
                                                                       @RequestBody @Valid DepartamentoRequest request) {
         return ResponseEntity.ok(service.atualizarDepartamento(id, request));
@@ -53,12 +55,14 @@ public class DepartamentoController implements DepartamentoControllerDocs {
 
     @GetMapping("/{id}")
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<DepartamentoResponse> obterDepartamentoPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterDepartamentoPeloId(id));
     }
 
     @GetMapping
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<DepartamentoResponse>> listarDepartamentos(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "localizacao", required = false) String localizacao,
@@ -71,12 +75,14 @@ public class DepartamentoController implements DepartamentoControllerDocs {
 
     @DeleteMapping("/{id}")
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletarDepartamentoPeloId(@PathVariable("id") Long id) {
         service.deletarDepartamentoPeloId(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/importar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DepartamentoResponse>> importarDados(@RequestParam("file")MultipartFile file) {
         return ResponseEntity.ok(service.importar(file));
     }

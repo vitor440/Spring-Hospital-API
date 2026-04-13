@@ -61,10 +61,8 @@ public class SecurityConfig {
                                 "/auth/refresh/**",
                                 "/auth/createUser",
                                 "/auth/**",
-                                "/auth/createRoles",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/roles",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**"
                         ).permitAll()

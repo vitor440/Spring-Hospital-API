@@ -24,6 +24,10 @@ public class TurnoAtendimentoValidator {
         if(verificaSobreposicao(turnoAtendimento)) {
             throw new HorariosConflitantesException("Conflito de disponibilidade: o horário informado se sobrepõe a outro já cadastrado para o médico neste dia.");
         }
+
+        if(turnoAtendimento.getHoraInicio().isAfter(turnoAtendimento.getHoraFim())) {
+            throw new RuntimeException("hora de inicio não pode posterior a hora fim");
+        }
     }
 
     private boolean verificaSobreposicao(TurnoAtendimento turnoAtendimento) {

@@ -57,14 +57,14 @@ public class PacienteController implements PacienteControllerDocs {
 
     @GetMapping("/{id}")
     @Override
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<PacienteResponse> obterPacientePeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterPacientePeloId(id));
     }
 
     @GetMapping("/me")
     @Override
-    @PreAuthorize("hasAnyRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<PacienteResponse> obterPacienteLogado() {
         return ResponseEntity.ok(service.obterPacienteLogado());
     }
@@ -73,7 +73,7 @@ public class PacienteController implements PacienteControllerDocs {
 
     @GetMapping
     @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<PacienteResponse>> listarPacientes(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "genero", required = false) String genero,
@@ -101,7 +101,7 @@ public class PacienteController implements PacienteControllerDocs {
     }
 
     @GetMapping("/{id}/consultas")
-    @PreAuthorize("hasHole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<ConsultaResponse>> obterConsultasPeloIdDoPaciente(
             @PathVariable("id") Long id,
             @RequestParam(value = "status", required = false) StatusConsulta status,
@@ -112,9 +112,8 @@ public class PacienteController implements PacienteControllerDocs {
     }
 
     @GetMapping("/me/consultas")
-    @PreAuthorize("hasHole('RECEPCIONISTA')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Page<ConsultaResponse>> obterConsultasPacienteLogado(
-            @PathVariable("id") Long id,
             @RequestParam(value = "status", required = false) StatusConsulta status,
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "5") int tamanho,

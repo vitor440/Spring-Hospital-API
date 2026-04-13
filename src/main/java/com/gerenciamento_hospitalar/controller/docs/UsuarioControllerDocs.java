@@ -28,7 +28,7 @@ public interface UsuarioControllerDocs {
             )
     }
     )
-    ResponseEntity<?> singIn(@RequestBody CadastroUsuarioDTO usuarioDTO);
+    ResponseEntity<?> signin(@RequestBody CadastroUsuarioDTO usuarioDTO);
 
 
 

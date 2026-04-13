@@ -40,8 +40,8 @@ public class TurnoController {
     }
 
     @GetMapping("medicos/{id}/turnos-atendimento")
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA')")
-    public ResponseEntity<List<TurnoAtendimentoResponse>> obterTurnosDeMedicoPeloId(
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+    public ResponseEntity<List<TurnoAtendimentoResponse>> obterTurnosPeloIdDoMedico(
             @PathVariable("id") Long id,
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho

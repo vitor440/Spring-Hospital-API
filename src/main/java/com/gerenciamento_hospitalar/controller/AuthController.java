@@ -21,9 +21,9 @@ public class AuthController implements UsuarioControllerDocs {
     private final AuthenticationService authenticationService;
     private final RolesService roleService;
 
-    @PostMapping("/singin")
+    @PostMapping("/signin")
     @Override
-    public ResponseEntity<?> singIn(@RequestBody CadastroUsuarioDTO usuarioDTO) {
+    public ResponseEntity<?> signin(@RequestBody CadastroUsuarioDTO usuarioDTO) {
         TokenDTO authenticate = authenticationService.authenticate(usuarioDTO);
 
         if(authenticate == null) throw new UsernameNotFoundException("Username not found!");
@@ -51,6 +51,7 @@ public class AuthController implements UsuarioControllerDocs {
 
     @Override
     @PostMapping("/{userId}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> adicionaRole(@PathVariable("userId") Long userId, @RequestBody RoleDTO roleDTO) {
         authenticationService.adicionaRole(userId, roleDTO);
         return ResponseEntity.noContent().build();
@@ -58,6 +59,7 @@ public class AuthController implements UsuarioControllerDocs {
 
     @Override
     @PostMapping("/createRoles")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Role> criaRole(@RequestBody Role role) {
         return ResponseEntity.ok(roleService.createRole(role));
     }

@@ -46,14 +46,14 @@ public class ConsultaController implements ConsultaControllerDocs {
 
     @GetMapping("/consultas/{id}")
     @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<ConsultaResponse> obterConsultaPeloId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.obterConsultaPeloId(id));
     }
 
     @GetMapping("/consultas")
     @Override
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public ResponseEntity<Page<ConsultaResponse>> listarConsultas(
             @RequestParam(value = "pagina", defaultValue = "0") int pagina,
             @RequestParam(value = "tamanho", defaultValue = "6") int tamanho,

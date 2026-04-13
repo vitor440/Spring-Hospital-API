@@ -44,6 +44,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSp
     @Query("SELECT c FROM Consulta c WHERE c.medico.id = :id AND c.status = :status")
     List<Consulta> obterConsultasPeloIdDoMedicoEPeloStatus(Long id, StatusConsulta status);
 
+
     // === BUSCAS POR PACIENTES ===
 
     @Query("SELECT c FROM Consulta c WHERE c.paciente.id = :id")
