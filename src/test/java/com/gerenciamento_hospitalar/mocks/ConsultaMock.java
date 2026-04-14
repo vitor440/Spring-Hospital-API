@@ -13,8 +13,8 @@ public class ConsultaMock {
         Consulta consulta = new Consulta();
         consulta.setMedico(MedicoMock.mockMedico(i));
         consulta.setPaciente(PacienteMock.mockPaciente(i));
-        consulta.setData(LocalDate.now());
-        consulta.setHora(LocalTime.of(16, 0));
+        LocalDate data = LocalDate.of(2030 + 1, 1, 1);
+        LocalTime hora = LocalTime.of(i,0);
         consulta.setProposito("proposito" + i);
        // consulta.setStatus(i % 2 == 0? StatusConsulta.AGENDADA: StatusConsulta.CANCELADA);
         //consulta.setDiaSemana(i % 2 == 0? DiaSemana.SEGUNDA: DiaSemana.TERCA);
@@ -22,19 +22,10 @@ public class ConsultaMock {
         return consulta;
     }
 
-    public static Consulta mockConsultaSalva(int i) {
-        Consulta consulta = mockConsulta(i);
-        consulta.setStatus(i % 2 == 0? StatusConsulta.AGENDADA: StatusConsulta.CANCELADA);
-        consulta.setDiaSemana(i % 2 == 0? DiaSemana.SEGUNDA: DiaSemana.TERCA);
-        consulta.setId((long) i);
-        return consulta;
-    }
-
-
 
     public static ConsultaRequest mockConsultaRequest(int i) {
-        LocalDate data = LocalDate.now();
-        LocalTime hora = LocalTime.of(16, 0);
+        LocalDate data = LocalDate.of(2030 + 1, 1, 1);
+        LocalTime hora = LocalTime.of(i,0);
         String proposito = "proposito" + i;
 
 
@@ -42,8 +33,8 @@ public class ConsultaMock {
     }
 
     public static ConsultaResponse mockConsultaResponse(int i) {
-        LocalDate data = LocalDate.now();
-        LocalTime hora = LocalTime.of(16, 0);
+        LocalDate data = LocalDate.of(2030 + 1, 1, 1);
+        LocalTime hora = LocalTime.of(i,0);
         String proposito = "proposito" + i;
         StatusConsulta statusConsulta = i % 2 == 0 ? StatusConsulta.AGENDADA : StatusConsulta.CANCELADA;
         DiaSemana diaSemana = i % 2 == 0 ? DiaSemana.SEGUNDA : DiaSemana.TERCA;

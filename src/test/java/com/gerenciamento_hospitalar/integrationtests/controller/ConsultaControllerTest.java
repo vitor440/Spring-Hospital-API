@@ -47,15 +47,15 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(1)
-    void singin() throws JsonProcessingException {
+    void signin() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
+                .setBasePath("/auth/signin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CadastroUsuarioDTO(null, "recepcionista", "recepcionista123", "recepcionista"))
+                .body(new CadastroUsuarioDTO("recepcionista", "recepcionista123", "recepcionista"))
                 .when()
                 .post()
                 .then()
@@ -97,11 +97,6 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
     void agendarConsultaComMedicoIndisponivel() throws JsonProcessingException {
         request = mockConsultaRequestMedicoIndisponivel();
 
-        specification = new RequestSpecBuilder()
-                .setBasePath("/consultas")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenRecepcionista.acessToken())
@@ -119,11 +114,6 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
     @Order(4)
     void agendarConsulta() throws JsonProcessingException {
         request = mockConsultaRequest();
-
-        specification = new RequestSpecBuilder()
-                .setBasePath("/consultas")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -181,11 +171,6 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(6)
     void obterConsultaPeloId() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/consultas/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenRecepcionista.acessToken())
@@ -209,10 +194,6 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(7)
     void obterConsultaComIdInexistente() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/consultas/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -268,11 +249,6 @@ class ConsultaControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(10)
     void deletarConsultaComIdInexistente() {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/consultas/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenRecepcionista.acessToken())

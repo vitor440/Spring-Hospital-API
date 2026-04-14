@@ -57,8 +57,6 @@ public class TurnoAtendimentoService {
 
     @Transactional
     public List<TurnoAtendimentoResponse> obterTurnosDeMedicoPeloId(Long id, int pagina, int tamanho) {
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-
         Medico medico = obterMedicoPorIdOuLancarExcecao(id);
 
         List<TurnoAtendimento> disponibilidades = medico.getDisponibilidades();
@@ -79,22 +77,11 @@ public class TurnoAtendimentoService {
     @Transactional
     public List<TurnoAtendimentoResponse> obterTurnosDeMedicoLogado() {
         Usuario usuario = securityService.getUsuarioLogado();
-        if(!usuario.getRoles().contains("MEDICO")) {
-            throw new AcessoNegadoException("acesso negado!");
-        }
-
-        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
-
-        if(medicoOpt.isPresent()) {
-            Medico medico = medicoOpt.get();
-            List<TurnoAtendimento> turnos = medico.getDisponibilidades();
-            if (turnos == null) return List.of();
-
-            return turnos.stream().map(mapper::toDTO).toList();
-        }
-
-        throw new AcessoNegadoException("acesso negado!");
+        Medico medico = obterMedicoLogado(usuario);
+        List<TurnoAtendimento> turnos = medico.getDisponibilidades();
+        return turnos.stream().map(mapper::toDTO).toList();
     }
+
 
     private TurnoAtendimento obterTurnoPorIdOuLancarExcecao(Long id) {
         return turnoAtendimentoRepository.findById(id)
@@ -104,5 +91,15 @@ public class TurnoAtendimentoService {
     private Medico obterMedicoPorIdOuLancarExcecao(Long id) {
         return medicoRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe médico com esse ID!"));
+    }
+
+    private Medico obterMedicoLogado(Usuario usuario) {
+        Optional<Medico> medicoOpt = medicoRepository.findByUsuario(usuario);
+
+        if(medicoOpt.isEmpty()) {
+            throw new AcessoNegadoException("acesso negado.");
+        }
+
+        return medicoOpt.get();
     }
 }

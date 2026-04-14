@@ -4,14 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gerenciamento_hospitalar.config.TestConfig;
-import com.gerenciamento_hospitalar.dto.request.MedicoRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
-import com.gerenciamento_hospitalar.dto.response.MedicoResponse;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
 import com.gerenciamento_hospitalar.dto.security.CadastroUsuarioDTO;
 import com.gerenciamento_hospitalar.dto.security.TokenDTO;
 import com.gerenciamento_hospitalar.integrationtests.AbstractIntegrationTest;
-import com.gerenciamento_hospitalar.mocks.PrescricaoMock;
 import com.gerenciamento_hospitalar.mocks.ResultadoConsultaMock;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -45,15 +42,15 @@ class ResultadoConsultaControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(1)
-    void singinTokenMedico() throws IOException {
+    void signinTokenMedico() throws IOException {
         specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
+                .setBasePath("/auth/signin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CadastroUsuarioDTO(null, "robson amorim", "medico123", "robson amorim"))
+                .body(new CadastroUsuarioDTO("robson amorim", "medico123", "robson amorim"))
                 .when()
                 .post()
                 .then()
@@ -102,14 +99,111 @@ class ResultadoConsultaControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void atualizarResultadoConsulta() {
+    @Order(3)
+    void gerarResultadoDeConsultaQueJaPossuiResultado() throws JsonProcessingException {
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .body(request)
+                .pathParam("id", 1L)
+                .when()
+                .post()
+                .then()
+                .statusCode(409);
     }
 
     @Test
-    void obterResultadoConsulta() {
+    @Order(4)
+    void atualizarResultadoConsulta() throws JsonProcessingException {
+        request = ResultadoConsultaMock.mockRequest(2);
+
+        specification = new RequestSpecBuilder()
+                .setBasePath("resultadoConsulta/{id}")
+                .setPort(TestConfig.SERVER_PORT)
+                .build();
+
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .body(request)
+                .pathParam("id", 1L)
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        response = objectMapper.readValue(content, ResultadoConsultaResponse.class);
+
+        Assertions.assertThat(response.diagnostico()).isEqualTo("Diagnostico2");
+        Assertions.assertThat(response.notas()).isEqualTo("Notas2");
+        Assertions.assertThat(response.tratamento()).isEqualTo("Tratamento2");
     }
 
     @Test
+    @Order(5)
+    void obterResultadoConsulta() throws JsonProcessingException {
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .pathParam("id", 1L)
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        response = objectMapper.readValue(content, ResultadoConsultaResponse.class);
+
+        Assertions.assertThat(response.diagnostico()).isEqualTo("Diagnostico2");
+        Assertions.assertThat(response.notas()).isEqualTo("Notas2");
+        Assertions.assertThat(response.tratamento()).isEqualTo("Tratamento2");
+    }
+
+    @Test
+    @Order(6)
+    void obterResultadoConsultaInexistente() throws JsonProcessingException {
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .pathParam("id", 99L)
+                .when()
+                .get()
+                .then()
+                .statusCode(404);
+
+    }
+
+    @Test
+    @Order(7)
     void deletarResultadoConsulta() {
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .pathParam("id", 1L)
+                .when()
+                .delete()
+                .then()
+                .statusCode(204);
     }
+
+    @Test
+    @Order(7)
+    void deletarResultadoConsultaInexistente() {
+        var content = given(specification)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenMedico.acessToken())
+                .pathParam("id", 99L)
+                .when()
+                .delete()
+                .then()
+                .statusCode(404);
+    }
+
+
 }

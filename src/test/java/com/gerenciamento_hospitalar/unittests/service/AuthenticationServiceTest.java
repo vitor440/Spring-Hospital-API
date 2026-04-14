@@ -68,7 +68,7 @@ class AuthenticationServiceTest {
 
         usuario = UsuarioMock.mockUsuario(1);
         usuario.setPermissions(List.of(role));
-        usuarioDTO = new CadastroUsuarioDTO(1L, "admin", "admin123", "admin");
+        usuarioDTO = new CadastroUsuarioDTO("admin", "admin123", "admin");
         tokenDTO = new TokenDTO("admin", true, new Date(), new Date(), "23434324324", "4324324234234");
     }
 

@@ -72,9 +72,9 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(2)
-    void singIn() throws JsonProcessingException {
+    void signin() throws JsonProcessingException {
         RequestSpecification specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
+                .setBasePath("/auth/signin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
@@ -165,7 +165,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParams("userId", usuarioSalvo.id())
+                .pathParams("userId", 1L)
                 .body(new RoleDTO(List.of("ADMIN2")))
                 .when()
                 .post()
@@ -177,7 +177,7 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
 
     private static CadastroUsuarioDTO mockUsuarioDTO() {
-        CadastroUsuarioDTO usuarioDTO1 = new CadastroUsuarioDTO(null, "admin2", "admin123", "admin2");
+        CadastroUsuarioDTO usuarioDTO1 = new CadastroUsuarioDTO("admin2", "admin123", "admin2");
         return usuarioDTO1;
     }
 }

@@ -183,6 +183,8 @@ public class MedicoService {
     }
 
 
+
+
     private Medico obterMedicoPeloIdOuLancarExcecao(Long id) {
         return medicoRepository.findById(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe médico com esse ID!"));

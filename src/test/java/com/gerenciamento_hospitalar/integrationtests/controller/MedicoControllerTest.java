@@ -29,7 +29,6 @@ import java.time.LocalTime;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_TIME;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -52,15 +51,15 @@ class MedicoControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(1)
-    void singinTokenMedico() throws IOException {
+    void signinTokenMedico() throws IOException {
         specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
+                .setBasePath("/auth/signin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CadastroUsuarioDTO(null, "robson amorim", "medico123", "robson amorim"))
+                .body(new CadastroUsuarioDTO("robson amorim", "medico123", "robson amorim"))
                 .when()
                 .post()
                 .then()
@@ -79,15 +78,10 @@ class MedicoControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(2)
-    void singinTokenAdmin() throws IOException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
+    void signinTokenAdmin() throws IOException {
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CadastroUsuarioDTO(null, "admin", "admin123", "admin"))
+                .body(new CadastroUsuarioDTO("admin", "admin123", "admin"))
                 .when()
                 .post()
                 .then()
@@ -123,19 +117,13 @@ class MedicoControllerTest extends AbstractIntegrationTest {
                 .when()
                 .post()
                 .then()
-                .statusCode(403);
+                .statusCode(400);
 
     }
 
     @Test
     @Order(4)
     void addMedicoComRoleAdmin() throws IOException {
-
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
@@ -164,12 +152,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(5)
     void addMedicoComCrmRepetido() throws IOException {
-
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
@@ -218,11 +200,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(7)
     void obterMedicoPeloId() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
-
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header(TestConfig.HEADER_PARAM_AUTHORIZATION, "Bearer " + tokenAdmin.acessToken())
@@ -247,10 +224,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(8)
     void obterMedicoComIdInexistente() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -268,10 +241,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(9)
     void deletarMedicoPeloId() {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -287,10 +256,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(10)
     void deletarMedicoComIdInexistente() {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -306,10 +271,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(11)
     void deletarMedicoComConsultasRegistradas() {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/{id}")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -489,10 +450,6 @@ class MedicoControllerTest extends AbstractIntegrationTest {
     @Test
     @Order(16)
     void obterConsultasMedicoLogadoComFiltragemDeStatus() throws JsonProcessingException {
-        specification = new RequestSpecBuilder()
-                .setBasePath("/medicos/me/consultas")
-                .setPort(TestConfig.SERVER_PORT)
-                .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

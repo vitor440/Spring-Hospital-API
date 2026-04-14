@@ -8,11 +8,14 @@ import com.gerenciamento_hospitalar.mapper.MedicamentoMapper;
 import com.gerenciamento_hospitalar.mapper.ResultadoConsultaMapper;
 import com.gerenciamento_hospitalar.mocks.ConsultaMock;
 import com.gerenciamento_hospitalar.mocks.ResultadoConsultaMock;
+import com.gerenciamento_hospitalar.mocks.UsuarioMock;
 import com.gerenciamento_hospitalar.model.Consulta;
 import com.gerenciamento_hospitalar.model.ResultadoConsulta;
+import com.gerenciamento_hospitalar.model.Usuario;
 import com.gerenciamento_hospitalar.repository.ConsultaRepository;
 import com.gerenciamento_hospitalar.repository.ResultadoConsultaRepository;
 import com.gerenciamento_hospitalar.service.ResultadoConsultaService;
+import com.gerenciamento_hospitalar.service.SecurityService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,12 +47,18 @@ class ResultadoConsultaServiceTest {
     @Mock
     private MedicamentoMapper medicamentoMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private ResultadoConsultaService service;
+
+
 
     private ResultadoConsulta resultadoConsulta;
     private ResultadoConsultaRequest request;
     private ResultadoConsultaResponse response;
+    private Usuario usuario;
     private Consulta consulta;
 
     @BeforeEach
@@ -58,6 +67,7 @@ class ResultadoConsultaServiceTest {
         request = ResultadoConsultaMock.mockRequest(1);
         response = ResultadoConsultaMock.mockResponse(1);
         consulta = ConsultaMock.mockConsulta(1);
+        usuario = UsuarioMock.mockUsuario(1);
 
     }
 
@@ -66,6 +76,7 @@ class ResultadoConsultaServiceTest {
         // 1.cenário
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
         when(mapper.toEntity(request)).thenReturn(resultadoConsulta);
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(resultadoConsultaRepository.save(resultadoConsulta)).thenReturn(resultadoConsulta);
         when(mapper.toDTO(resultadoConsulta)).thenReturn(response);
 
@@ -81,6 +92,7 @@ class ResultadoConsultaServiceTest {
     @Test
     void gerarResultadoDaConsultaInexistente() {
         // 1.cenário
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(consultaRepository.findById(1L)).thenReturn(Optional.empty());
 
         // 2.execução
@@ -98,6 +110,7 @@ class ResultadoConsultaServiceTest {
         // 1.cenário
         consulta.setResultadoConsulta(resultadoConsulta);
 
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
 
 
@@ -116,6 +129,7 @@ class ResultadoConsultaServiceTest {
 
         // 1.cenário
         when(resultadoConsultaRepository.findById(1L)).thenReturn(Optional.of(resultadoConsulta));
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(resultadoConsultaRepository.save(resultadoConsulta)).thenReturn(resultadoConsulta);
         when(mapper.toDTO(resultadoConsulta)).thenReturn(response);
 
@@ -151,6 +165,7 @@ class ResultadoConsultaServiceTest {
 
         // 1.cenário
         when(resultadoConsultaRepository.findById(1L)).thenReturn(Optional.of(resultadoConsulta));
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
 
 
         // 2.execução
@@ -181,6 +196,7 @@ class ResultadoConsultaServiceTest {
     void obterResultadoPeloIdDaConsulta() {
 
         // 1.cenário
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         consulta.setResultadoConsulta(resultadoConsulta);
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
         when(mapper.toDTO(resultadoConsulta)).thenReturn(response);
@@ -197,6 +213,7 @@ class ResultadoConsultaServiceTest {
     void obterResultadoDeConsultaSemResultado() {
 
         // 1.cenário
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
 
         // 2.execução
@@ -229,6 +246,7 @@ class ResultadoConsultaServiceTest {
 
         // 1.cenário
         when(resultadoConsultaRepository.findById(1L)).thenReturn(Optional.of(resultadoConsulta));
+        when(securityService.getUsuarioLogado()).thenReturn(usuario);
         when(mapper.toDTO(resultadoConsulta)).thenReturn(response);
 
         // 2.execução

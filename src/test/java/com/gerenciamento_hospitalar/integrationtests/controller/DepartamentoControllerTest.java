@@ -54,13 +54,13 @@ class DepartamentoControllerTest extends AbstractIntegrationTest {
     @Order(1)
     void getToken() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
-                .setBasePath("/auth/singin")
+                .setBasePath("/auth/signin")
                 .setPort(TestConfig.SERVER_PORT)
                 .build();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CadastroUsuarioDTO(null, "admin", "admin123", "admin"))
+                .body(new CadastroUsuarioDTO("admin", "admin123", "admin"))
                 .when()
                 .post()
                 .then()

@@ -1,5 +1,6 @@
 package com.gerenciamento_hospitalar.service;
 
+import com.gerenciamento_hospitalar.dto.request.ConsultaRequest;
 import com.gerenciamento_hospitalar.dto.request.MedicamentoRequest;
 import com.gerenciamento_hospitalar.dto.request.ResultadoConsultaRequest;
 import com.gerenciamento_hospitalar.dto.response.ResultadoConsultaResponse;
@@ -26,14 +27,13 @@ public class ResultadoConsultaService {
     private final SecurityService securityService;
 
 
-    @Transactional
     public ResultadoConsultaResponse gerarResultadoDaConsulta(ResultadoConsultaRequest request, Long consultaId) {
 
         Usuario usuario = securityService.getUsuarioLogado();
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
         Medico medico = consulta.getMedico();
 
-        validaSeUsuarioTemPermissaoParaGerenciarResultado(medico, usuario);
+        validaSeMedicoEAssociadoAoUsuarioLogado(medico, usuario);
 
         if(consulta.getResultadoConsulta() != null) {
             throw new RegistroDuplicadoException("Esta consulta já possui resultado!");
@@ -56,6 +56,7 @@ public class ResultadoConsultaService {
             }
         }
 
+
         consultaRepository.modificaStatusConsulta(consultaId, StatusConsulta.REALIZADA);
         return mapper.toDTO(resultadoConsultaRepository.save(rs));
     }
@@ -66,7 +67,7 @@ public class ResultadoConsultaService {
         Usuario usuario = securityService.getUsuarioLogado();
         Medico medico = rs.getConsulta().getMedico();
 
-        validaSeUsuarioTemPermissaoParaGerenciarResultado(medico, usuario);
+        validaSeMedicoEAssociadoAoUsuarioLogado(medico, usuario);
 
         rs.setSintomas(request.sintomas());
         rs.setNotas(request.notas());
@@ -89,6 +90,7 @@ public class ResultadoConsultaService {
                 }
             }
         }
+
         return mapper.toDTO(resultadoConsultaRepository.save(rs));
     }
 
@@ -98,13 +100,17 @@ public class ResultadoConsultaService {
         Usuario usuario = securityService.getUsuarioLogado();
         Medico medico = rs.getConsulta().getMedico();
 
-        validaSeUsuarioTemPermissaoParaGerenciarResultado(medico, usuario);
+        validaSeMedicoEAssociadoAoUsuarioLogado(medico, usuario);
         resultadoConsultaRepository.delete(rs);
     }
 
 
     public ResultadoConsultaResponse obterResultadoPeloIdDaConsulta(Long consultaId) {
+        Usuario usuario = securityService.getUsuarioLogado();
         Consulta consulta = obterConsultaPeloIdOuLancarExcecao(consultaId);
+        Medico medico = consulta.getMedico();
+
+        validaSeMedicoEAssociadoAoUsuarioLogado(medico, usuario);
 
         if(consulta.getResultadoConsulta() == null) {
             throw new RegistroNaoEncontradoException("Não existe resultado para essa consulta!");
@@ -117,10 +123,9 @@ public class ResultadoConsultaService {
         ResultadoConsulta rs = obterResultadoConsultaPeloIdOuLancarExcecao(id);
         Usuario usuario = securityService.getUsuarioLogado();
 
-        if(usuario.getRoles().contains("MEDICO")) {
-            Medico medico = rs.getConsulta().getMedico();
-            validaSeUsuarioTemPermissaoParaGerenciarResultado(medico, usuario);
-        }
+        Medico medico = rs.getConsulta().getMedico();
+        validaSeMedicoEAssociadoAoUsuarioLogado(medico, usuario);
+
 
         return mapper.toDTO(rs);
     }
@@ -137,7 +142,7 @@ public class ResultadoConsultaService {
                 .orElseThrow(() -> new RegistroNaoEncontradoException("Não existe resultado de consulta com esse ID!"));
     }
 
-    private void validaSeUsuarioTemPermissaoParaGerenciarResultado(Medico medico, Usuario usuario) {
+    private void validaSeMedicoEAssociadoAoUsuarioLogado(Medico medico, Usuario usuario) {
         if(!medico.getUsuario().getId().equals(usuario.getId())) {
             throw new AcessoNegadoException("médico não autorizado!");
         }
