@@ -26,7 +26,7 @@ public class TurnoAtendimentoValidator {
         }
 
         if(turnoAtendimento.getHoraInicio().isAfter(turnoAtendimento.getHoraFim())) {
-            throw new RuntimeException("hora de inicio não pode posterior a hora fim");
+            throw new RuntimeException("hora de inicio não pode ser posterior a hora de fim");
         }
     }
 
